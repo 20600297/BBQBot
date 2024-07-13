@@ -1,0 +1,50 @@
+target/
+.mvn
+.mvn/**
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### VS Code ###
+.vscode/
+./data
+
+### Maven ###
+mvnw
+mvnw.cmd
+
+### 忽略测试文件
+test
+### 忽略Log文件
+logs
+*.log
+### 忽略db文件
+/data
+### 忽略其余文件
+/DataSource
+/models
+locate.yaml
