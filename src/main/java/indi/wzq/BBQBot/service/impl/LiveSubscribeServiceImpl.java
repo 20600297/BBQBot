@@ -22,14 +22,6 @@ public class LiveSubscribeServiceImpl implements LiveSubscribeService {
         liveSubscribeRepository.save(liveSubscribe);
     }
 
-    /**
-     * 获取所有订阅信息
-     * @return 订阅信息列表
-     */
-    @Override
-    public List<LiveSubscribe> findAll() {
-        return liveSubscribeRepository.findAll();
-    }
 
     /**
      * 通过直播id获取订阅信息

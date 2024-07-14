@@ -58,16 +58,6 @@ public class LiveInfoServiceImpl implements LiveInfoService {
     }
 
     /**
-     * 通过房间id获取直播间状态
-     * @param room_id 直播id
-     * @return 状态码
-     */
-    @Override
-    public Integer findStatusByRoomId(String room_id) {
-        return liveInfoRepository.findStatusByRoomId(room_id);
-    }
-
-    /**
      * 通过房间id更改直播间状态
      * @param room_id 直播id
      * @param status_code 状态码
