@@ -8,6 +8,4 @@ public interface LiveInfoRepository extends JpaRepository<LiveInfo,String> , Jpa
 
     LiveInfo findLiveByRoomId(String room_id);
 
-    Integer findStatusByRoomId(String room_id);
-
 }

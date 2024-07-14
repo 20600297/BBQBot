@@ -20,6 +20,9 @@ public class LiveInfo {
     // 主播昵称
     String uname;
 
+    // 主播头像
+    String face;
+
     // 直播间标题
     String title;
 

@@ -10,6 +10,7 @@ import indi.wzq.BBQBot.service.LiveInfoService;
 import indi.wzq.BBQBot.service.LiveSubscribeService;
 import indi.wzq.BBQBot.utils.BilibiliUtils;
 import indi.wzq.BBQBot.utils.SpringUtils;
+import indi.wzq.BBQBot.utils.onebot.Msg;
 
 public class BilibiliCodes {
 
@@ -36,6 +37,7 @@ public class BilibiliCodes {
         // 判断是否为空
         if (room_id.isEmpty()) {
             bot.sendMsg(event, "订阅直播间指令后面加上要订阅的房间号！", false);
+            return;
         }
 
         // 通过房间id获取直播间信息
@@ -44,9 +46,18 @@ public class BilibiliCodes {
         // 判断信息是否正常获取
         if (liveInfo != null){
 
+            // 获取BotId
+            long botId = bot.getLoginInfo().getData().getUserId();
+
+            // 判断是否已经订阅
+            if( liveSubscribeService.existsByBotIdAndRoomId(botId,room_id) ){
+                bot.sendMsg(event, "订阅失败！\r\n%s 已经被订阅了呢。".formatted(room_id), false);
+                return;
+            }
+
             // 构建订阅信息
             LiveSubscribe liveSubscribe = new LiveSubscribe(
-                    bot.getLoginInfo().getData().getUserId(),
+                    botId,
                     event.getGroupId(),
                     room_id
             );
@@ -57,8 +68,14 @@ public class BilibiliCodes {
             // 保存直播间信息
             liveInfoService.saveLiveInfo(liveInfo);
 
+            // 构建订阅成功返回消息
+            String msg = Msg.builder().text("成功订阅-\r\n")
+                    .img(liveInfo.getFace())
+                    .text(liveInfo.getUname() + "\r\n的直播间！")
+                    .build();
+
             // 发送订阅成功信息
-            bot.sendMsg(event, "订阅成功！%s \r\n当前直播状态为 %d。".formatted(room_id, liveInfo.getStatus()), false);
+            bot.sendMsg(event, msg, true);
 
         } else {
 

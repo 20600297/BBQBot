@@ -8,7 +8,6 @@ public class BilibiliUtils {
 
     //TODO:Bilibili信息获取代码优化
 
-
     /***
      * 通过房间id获取直播间信息
      * @param room_id 房间id
@@ -18,17 +17,22 @@ public class BilibiliUtils {
         HttpUtils.Body body = HttpUtils.sendGet("https://api.live.bilibili.com/xlive/web-room/v1/index/getInfoByRoom", "room_id=" + room_id);
 
         if (JSONObject.parseObject(body.getBody()).getInteger("code") == 0) {
-            JSONObject data = JSONObject.parseObject(body.getBody()).getJSONObject("data");
 
-            String uname = data.getJSONObject("anchor_info").getJSONObject("base_info").getString("uname");
+            JSONObject anchor_info = JSONObject.parseObject(body.getBody()).getJSONObject("data").getJSONObject("anchor_info");
 
-            String title = data.getJSONObject("room_info").getString("title");
+            JSONObject room_info = JSONObject.parseObject(body.getBody()).getJSONObject("data").getJSONObject("room_info");
 
-            String cover = data.getJSONObject("room_info").getString("cover");
+            String uname = anchor_info.getJSONObject("base_info").getString("uname");
 
-            Integer status = data.getJSONObject("room_info").getInteger("live_status");
+            String face = anchor_info.getJSONObject("base_info").getString("face");
 
-            return new LiveInfo(room_id,uname,title,cover,status);
+            String title = room_info.getString("title");
+
+            String cover = room_info.getString("cover");
+
+            Integer status = room_info.getInteger("live_status");
+
+            return new LiveInfo(room_id,uname,face,title,cover,status);
         } else {
             System.out.println(room_id + "：直播间状态异常");
             return null;

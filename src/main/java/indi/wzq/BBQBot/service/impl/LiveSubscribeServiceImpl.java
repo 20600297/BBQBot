@@ -31,4 +31,15 @@ public class LiveSubscribeServiceImpl implements LiveSubscribeService {
         return liveSubscribeRepository.findAll();
     }
 
+    /***
+     * 通过BotId和RoomId判断是否存在订阅
+     * @param bot_id BotID
+     * @param room_id 房间号
+     * @return 是否存在的布尔值
+     */
+    @Override
+    public boolean existsByBotIdAndRoomId(long bot_id, String room_id) {
+        return liveSubscribeRepository.existsByBotIdAndRoomId(bot_id,room_id);
+    }
+
 }

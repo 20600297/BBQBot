@@ -22,6 +22,6 @@ public interface LiveInfoService {
      * @param room_id 房间id
      * @param status_code 状态码
      */
-    void updateLiveByRoomId(String room_id , Integer status_code);
+    void updateLiveInfoByRoomId(String room_id , Integer status_code);
 
 }

@@ -6,4 +6,6 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 public interface LiveSubscribeRepository extends JpaRepository<LiveSubscribe,Long> , JpaSpecificationExecutor<LiveSubscribe> {
 
+    boolean existsByBotIdAndRoomId(long bot_id,String room_id);
+
 }

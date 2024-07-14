@@ -27,7 +27,7 @@ public class LiveInfoServiceImpl implements LiveInfoService {
      */
     @Override
     public Integer findStatusByRoomId(String room_id) {
-        return liveInfoRepository.findStatusByRoomId(room_id);
+        return liveInfoRepository.findLiveByRoomId(room_id).getStatus();
     }
 
     /***
@@ -36,7 +36,7 @@ public class LiveInfoServiceImpl implements LiveInfoService {
      * @param status_code 状态码
      */
     @Override
-    public void updateLiveByRoomId(String room_id , Integer status_code) {
+    public void updateLiveInfoByRoomId(String room_id , Integer status_code) {
         LiveInfo liveInfo = liveInfoRepository.findLiveByRoomId(room_id);
         liveInfo.setStatus(status_code);
         liveInfoRepository.save(liveInfo);

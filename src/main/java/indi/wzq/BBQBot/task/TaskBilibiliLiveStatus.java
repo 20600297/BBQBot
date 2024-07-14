@@ -3,11 +3,13 @@ package indi.wzq.BBQBot.task;
 
 import com.mikuac.shiro.core.Bot;
 import com.mikuac.shiro.core.BotContainer;
+import indi.wzq.BBQBot.entity.bilibili.LiveInfo;
 import indi.wzq.BBQBot.entity.group.LiveSubscribe;
 import indi.wzq.BBQBot.service.LiveInfoService;
 import indi.wzq.BBQBot.service.LiveSubscribeService;
 import indi.wzq.BBQBot.utils.BilibiliUtils;
 import indi.wzq.BBQBot.utils.SpringUtils;
+import indi.wzq.BBQBot.utils.onebot.Msg;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
@@ -57,18 +59,34 @@ public class TaskBilibiliLiveStatus {
                 log.info("直播间 " + room_id + " 状态变化为 " + statusCode);
 
                 // 更新状态码
-                liveInfoService.updateLiveByRoomId(room_id,statusCode);
+                liveInfoService.updateLiveInfoByRoomId(room_id,statusCode);
 
                 // 判断是否是更改为开播
                 if(statusCode == 1){
 
-                    //TODO:开播提示添加主播信息
-
                     // 获取订阅的Bot
                     Bot bot = botContainer.robots.get(subscribe.getBotId());
 
-                    // 发送推送信息
-                    bot.sendGroupMsg(subscribe.getGroupId(), "直播间 " + room_id + " 开播啦，快去围观！", false);
+                    // 获取直播间信息
+                    LiveInfo liveInfo = BilibiliUtils.getLiveInfoByRoomId(room_id);
+
+                    // 判断是否正常获取直播间信息
+                    if(liveInfo != null){
+                        // 构建开播提醒消息
+                        String msg = Msg.builder().text(liveInfo.getUname() + " 开播了！\r\n")
+                                .img(liveInfo.getCover())
+                                .text(liveInfo.getTitle())
+                                .build();
+
+                        // 发送推送信息
+                        bot.sendGroupMsg(subscribe.getGroupId(), msg, true);
+                    } else {
+
+                         log.info(room_id + " 直播间信息获取异常");
+                        // 发送推送信息
+                        bot.sendGroupMsg(subscribe.getGroupId(), "直播间 " + room_id + " 开播啦，快去围观！", false);
+
+                    }
 
                 }
 
