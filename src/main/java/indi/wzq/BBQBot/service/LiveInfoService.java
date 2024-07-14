@@ -33,13 +33,6 @@ public interface LiveInfoService {
     Map<String,Integer> findAllRoomIdToStatus();
 
     /**
-     * 通过房间id获取直播间状态
-     * @param room_id 房间id
-     * @return 状态码
-     */
-    Integer findStatusByRoomId(String room_id);
-
-    /**
      * 通过房间id更新状态码
      * @param room_id 房间id
      * @param status_code 状态码

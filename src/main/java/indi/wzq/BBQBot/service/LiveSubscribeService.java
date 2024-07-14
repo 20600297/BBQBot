@@ -13,12 +13,6 @@ public interface LiveSubscribeService {
     void saveLiveSubscribe(LiveSubscribe liveSubscribe);
 
     /**
-     * 获取所有订阅信息
-     * @return 订阅信息列表
-     */
-    List<LiveSubscribe> findAll();
-
-    /**
      * 通过直播id获取订阅信息
      * @param room_id 直播id
      * @return 订阅信息列表
