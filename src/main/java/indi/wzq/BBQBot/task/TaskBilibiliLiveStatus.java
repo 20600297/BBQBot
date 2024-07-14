@@ -55,8 +55,7 @@ public class TaskBilibiliLiveStatus {
             // 判断状态码是否改变
             if (!statusCode.equals(liveInfoService.findStatusByRoomId(room_id))){
 
-                // 输出日志
-                log.info("直播间 " + room_id + " 状态变化为 " + statusCode);
+                System.out.println("直播间 " + room_id + " 状态变化为 " + statusCode);
 
                 // 更新状态码
                 liveInfoService.updateLiveInfoByRoomId(room_id,statusCode);
