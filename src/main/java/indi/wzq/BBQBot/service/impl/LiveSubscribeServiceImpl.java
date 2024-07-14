@@ -13,7 +13,7 @@ public class LiveSubscribeServiceImpl implements LiveSubscribeService {
 
     private static final LiveSubscribeRepository liveSubscribeRepository = SpringUtils.getBean(LiveSubscribeRepository.class);
 
-    /***
+    /**
      * 保存订阅信息
      * @param liveSubscribe 订阅信息
      */
@@ -22,16 +22,26 @@ public class LiveSubscribeServiceImpl implements LiveSubscribeService {
         liveSubscribeRepository.save(liveSubscribe);
     }
 
-    /***
+    /**
      * 获取所有订阅信息
      * @return 订阅信息列表
      */
     @Override
-    public List<LiveSubscribe> findAllLiveSubscribe() {
+    public List<LiveSubscribe> findAll() {
         return liveSubscribeRepository.findAll();
     }
 
-    /***
+    /**
+     * 通过直播id获取订阅信息
+     * @param room_id 直播id
+     * @return 订阅信息列表
+     */
+    @Override
+    public List<LiveSubscribe> findAllByRoomId(String room_id) {
+        return liveSubscribeRepository.findAllByRoomId(room_id);
+    }
+
+    /**
      * 通过BotId和RoomId判断是否存在订阅
      * @param bot_id BotID
      * @param room_id 房间号

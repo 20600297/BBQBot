@@ -8,7 +8,7 @@ public class BilibiliUtils {
 
     //TODO:Bilibili信息获取代码优化
 
-    /***
+    /**
      * 通过房间id获取直播间信息
      * @param room_id 房间id
      * @return 直播间信息类实例
@@ -39,7 +39,7 @@ public class BilibiliUtils {
         }
     }
 
-    /***
+    /**
      * 通过房间id获取直播间状态码
      * @param room_id 房间id
      * @return 直播间状态码
