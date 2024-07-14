@@ -82,7 +82,7 @@ public class TaskBilibiliLiveStatus {
                         bot.sendGroupMsg(subscribe.getGroupId(), msg, true);
                     } else {
 
-                         log.info(room_id + " 直播间信息获取异常");
+                        log.info(room_id + " 直播间信息获取异常");
                         // 发送推送信息
                         bot.sendGroupMsg(subscribe.getGroupId(), "直播间 " + room_id + " 开播啦，快去围观！", false);
 

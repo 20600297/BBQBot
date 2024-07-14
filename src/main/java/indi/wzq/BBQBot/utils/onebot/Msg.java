@@ -3,6 +3,9 @@ package indi.wzq.BBQBot.utils.onebot;
 import com.mikuac.shiro.common.utils.MsgUtils;
 import com.mikuac.shiro.common.utils.OneBotMedia;
 import com.mikuac.shiro.common.utils.ShiroUtils;
+import org.eclipse.jgit.util.Base64;
+
+import static java.lang.String.format;
 
 public class Msg extends MsgUtils {
     private final StringBuilder builder = new StringBuilder();
@@ -54,6 +57,18 @@ public class Msg extends MsgUtils {
         return this;
     }
 
+    /**
+     * 图片
+     *
+     * @param b Base64 byte[]
+     * @return {@link Msg}
+     */
+    public Msg imgBase64(byte[] b) {
+        this.builder.append(
+                format("[CQ:image,file=%s]", ShiroUtils.escape("base64://" + Base64.encodeBytes(b)))
+        );
+        return this;
+    }
 
     /**
      * 短视频

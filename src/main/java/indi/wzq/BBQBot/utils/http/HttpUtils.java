@@ -9,7 +9,9 @@ import okhttp3.*;
 import org.jetbrains.annotations.NotNull;
 
 import javax.net.ssl.*;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
@@ -49,6 +51,19 @@ public class HttpUtils {
         ) {
             //返回体
             return getBody(response);
+        } catch (IOException e) {
+            log.error(e.getMessage());
+            return new Body(HttpCodeEnum.ERROR);
+        }
+    }
+
+    public static Body sendGetFile(String url, String param, Headers.Builder headers){
+        try (
+
+                Response response = client.newCall(send(url, param, headers)).execute()
+        ) {
+            //返回体
+            return getFileBody(response);
         } catch (IOException e) {
             log.error(e.getMessage());
             return new Body(HttpCodeEnum.ERROR);
@@ -103,6 +118,28 @@ public class HttpUtils {
         return body;
     }
 
+    @NotNull
+    private static Body getFileBody(Response response) {
+        Body body = new Body();
+        Optional.ofNullable(response.body()).ifPresentOrElse(r -> {
+            //响应体
+            try {
+                body.setFile(r.bytes());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            //响应code
+            body.setCode(HttpCodeEnum.getCode(response.code()));
+            //响应头
+            body.setHeaders(response.headers());
+
+            response.close();
+        }, () -> {
+            body.setCode(HttpCodeEnum.getCode(response.code()));
+        });
+        response.close();
+        return body;
+    }
 
 
     private static SSLSocketFactory getSocketFactory(TrustManager manager) {
@@ -141,7 +178,6 @@ public class HttpUtils {
     }
 
 
-
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
@@ -155,4 +191,5 @@ public class HttpUtils {
             this.code = code;
         }
     }
+
 }
