@@ -6,12 +6,22 @@ import com.mikuac.shiro.dto.event.message.AnyMessageEvent;
 import indi.wzq.BBQBot.entity.group.UserInfo;
 import indi.wzq.BBQBot.service.UserInfoService;
 import indi.wzq.BBQBot.utils.DateUtils;
+import indi.wzq.BBQBot.utils.GraphicUtils;
 import indi.wzq.BBQBot.utils.SpringUtils;
+import indi.wzq.BBQBot.utils.http.HttpUtils;
 import indi.wzq.BBQBot.utils.onebot.Msg;
+import lombok.extern.slf4j.Slf4j;
+import okhttp3.Headers;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Date;
 
 
+@Slf4j
 public class GroupCodes {
 
     private static final UserInfoService userInfoService = SpringUtils.getBean(UserInfoService.class);
@@ -45,16 +55,7 @@ public class GroupCodes {
             userInfo = new UserInfo(signUserId,signInTime,1,1,1);
             userInfoService.saveUserInfo(userInfo);
 
-            // 构建签到成功返回消息
-            String msg = Msg.builder().reply(event.getMessageId())
-                    .at(signUserId)
-                    .text("成功签到-")
-                    .text(DateUtils.format(signInTime,"yyyy/MM/dd") + "\t\n")
-                    .text("签到次数 1；连续签到 1。")
-                    .build();
-
-            // 发送签到成功信息
-            bot.sendMsg(event, msg, true);
+            sendSignMsg(bot,event,userInfo);
 
         } else {
 
@@ -86,20 +87,132 @@ public class GroupCodes {
                 // 更新用户信息
                 userInfoService.saveUserInfo(userInfo);
 
-                // 构建签到成功返回消息
-                String msg = Msg.builder().reply(event.getMessageId())
-                        .at(signUserId)
-                        .text("成功签到-")
-                        .text(DateUtils.format(signInTime,"yyyy/MM/dd") + "\t\n")
-                        .text("签到次数 %d；连续签到 %d。".formatted(userInfo.getSignInNum(),userInfo.getSignInContNum()))
-                        .build();
-
-                // 发送签到成功信息
-                bot.sendMsg(event, msg, true);
+                sendSignMsg(bot,event,userInfo);
             }
         }
-
-
     }
 
+    /**
+     * 发送签到成功消息
+     * @param bot Bot
+     * @param event Event
+     * @param user_info 用户信息
+     */
+    private static void sendSignMsg(Bot bot, AnyMessageEvent event,UserInfo user_info) {
+        // 绘制签到图像
+        BufferedImage bufferedImage = GraphicUtils
+                .graphicSignInMsg(getBackground(), getQqFace(user_info.getUserId()), event.getSender().getNickname());
+
+        String directoryPath = "./data/img/signInMsg/";
+        String fileName = DateUtils.format(new Date(), "yyyy-MM-dd") +"-" + user_info.getUserId() + "-sign.png";
+        String filePath = directoryPath + fileName;
+
+        // 创建 File 对象
+        File file = new File(filePath);
+
+        // 确保文件夹存在
+        if (!file.getParentFile().exists()) {
+            file.getParentFile().mkdirs();
+        }
+
+        try {
+            ImageIO.write(bufferedImage, "png", file);
+
+            // 构建签到成功返回消息
+            String msg = Msg.builder().reply(event.getMessageId())
+                    .at(user_info.getUserId())
+                    .text("成功签到-")
+                    .text(DateUtils.format(user_info.getSignInTime(),"yyyy/MM/dd") + "\t\n")
+                    .text("签到次数 %d；连续签到 %d。".formatted(user_info.getSignInNum(),user_info.getSignInContNum()))
+                    .img("file:///" + file.getAbsolutePath())
+                    .build();
+
+            // 发送签到成功信息
+            bot.sendMsg(event, msg, true);
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * 获取签到的背景图片
+     * @return 背景图片本地保存地址
+     */
+    private static String getBackground(){
+        HttpUtils.Body body = HttpUtils.sendGetFile("https://iw233.cn/api.php"
+                ,"sort=pc"
+                , Headers.of("referer", "https://weibo.com/").newBuilder());
+
+        String directoryPath = "./data/img/Background/";
+        String fileName = DateUtils.format(new Date(), "yyyy-MM-dd-HH_mm_ss") + "-bg.png";
+        String filePath = directoryPath + fileName;
+
+        // 创建 File 对象
+        File file = new File(filePath);
+
+        // 确保文件夹存在
+        if (!file.getParentFile().exists()) {
+            file.getParentFile().mkdirs();
+        }
+
+        // 使用 FileOutputStream 将二进制数据写入文件
+        try (FileOutputStream fos = new FileOutputStream(filePath)) {
+            fos.write(body.getFile()); // 将二进制数据写入文件
+        } catch (IOException e) {
+            e.printStackTrace();
+            log.info("保存图片 "+filePath+" 发生异常。");
+        }
+
+        // 判断图片是否正常
+        if ( GraphicUtils.isNull(filePath) ){
+            filePath = getBackground();
+
+        }
+        // 判断大小是否合适
+        if ( !GraphicUtils.isSuitable(filePath) ){
+            return getBackground();
+        }
+
+        return filePath;
+    }
+
+    /**
+     * 获取QQ头像
+     * @param user_id 用户id
+     * @return 用户头像
+     */
+    private static String getQqFace(long user_id){
+        HttpUtils.Body body = HttpUtils.sendGetFile("https://qlogo2.store.qq.com/qzone/"+user_id+"/"+user_id+"/100"
+                ,""
+                , Headers.of("*", "*").newBuilder());
+
+        // 指定要保存的图片文件名和路径
+        String directoryPath = "./data/img/QqFace/";
+        String fileName = DateUtils.format(new Date(), "yyyy-MM-dd-HH_mm_ss") +"-"+ user_id + "-face.png";
+        String filePath = directoryPath + fileName;
+
+        // 创建 File 对象
+        File file = new File(filePath);
+
+        // 确保文件夹存在
+        if (!file.getParentFile().exists()) {
+            file.getParentFile().mkdirs();
+        }
+
+        // 使用 FileOutputStream 将二进制数据写入文件
+        try (FileOutputStream fos = new FileOutputStream(filePath)) {
+            fos.write(body.getFile()); // 将二进制数据写入文件
+        } catch (IOException e) {
+            e.printStackTrace();
+            log.info("保存图片 "+filePath+" 发生异常。");
+        }
+
+        // 判断图像是否正常
+        if( GraphicUtils.isNull(filePath) ){
+           return getQqFace(user_id);
+        }
+
+        return filePath;
+    }
 }

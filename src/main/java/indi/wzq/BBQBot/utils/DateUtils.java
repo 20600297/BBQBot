@@ -2,6 +2,7 @@ package indi.wzq.BBQBot.utils;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.Date;
 
@@ -47,4 +48,25 @@ public class DateUtils {
         return localDate1.equals(localDate2.minusDays(1));
     }
 
+    /**
+     * 根据当前时间获得问候语
+     * @return 问候语
+     */
+    public static String getGreeting(){
+        LocalTime now = LocalTime.now(); // 获取当前时间
+        int hour = now.getHour(); // 获取当前小时
+
+        // 根据小时数判断时间段
+        if          (  4 <= hour & hour <  8 ) {
+            return "早上好！";
+        } else if   (  8 <= hour & hour < 11 ) {
+            return "上午好！";
+        } else if   ( 11 <= hour & hour < 15 ) {
+            return "中午好！";
+        } else if   ( 15 <= hour & hour < 19 ) {
+            return "下午好！";
+        } else {
+            return "晚上好！";
+        }
+    }
 }
