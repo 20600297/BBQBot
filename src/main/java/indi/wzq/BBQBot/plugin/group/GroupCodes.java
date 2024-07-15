@@ -124,10 +124,13 @@ public class GroupCodes {
                     .text("成功签到-")
                     .text(DateUtils.format(user_info.getSignInTime(),"yyyy/MM/dd") + "\t\n")
                     .text("签到次数 %d；连续签到 %d。".formatted(user_info.getSignInNum(),user_info.getSignInContNum()))
+                    .build();
+            // 发送签到成功信息
+            bot.sendMsg(event, msg, true);
+            msg = Msg.builder()
                     .img("file:///" + file.getAbsolutePath())
                     .build();
-
-            // 发送签到成功信息
+            // 发送签到图像
             bot.sendMsg(event, msg, true);
 
         } catch (IOException e) {
