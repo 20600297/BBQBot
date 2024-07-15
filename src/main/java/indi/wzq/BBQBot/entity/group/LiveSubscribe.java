@@ -24,10 +24,10 @@ public class LiveSubscribe {
     Long eid;
 
     // 订阅的Bot的id
-    long botId;
+    Long botId;
 
     // 订阅的群id
-    long groupId;
+    Long groupId;
 
     // 直播间id
     String roomId;

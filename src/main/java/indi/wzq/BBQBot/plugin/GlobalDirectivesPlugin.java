@@ -6,6 +6,7 @@ import com.mikuac.shiro.core.Bot;
 import com.mikuac.shiro.dto.event.message.AnyMessageEvent;
 import indi.wzq.BBQBot.enums.Codes;
 import indi.wzq.BBQBot.plugin.bilibili.BilibiliCodes;
+import indi.wzq.BBQBot.plugin.group.GroupCodes;
 import indi.wzq.BBQBot.utils.CodeUtils;
 import indi.wzq.BBQBot.utils.onebot.CqMatcher;
 import indi.wzq.BBQBot.utils.onebot.CqParse;
@@ -44,6 +45,7 @@ public class GlobalDirectivesPlugin {
         Optional.ofNullable(code).ifPresent(codes -> {
             switch (codes) {
                 case LIVE_SUBSCRIBE -> BilibiliCodes.subscribe(bot,event);
+                case GROUP_SIGNIN -> GroupCodes.signIn(bot,event);
             }
         });
     }

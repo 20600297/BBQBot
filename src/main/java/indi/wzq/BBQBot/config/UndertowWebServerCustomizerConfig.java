@@ -8,7 +8,7 @@ import org.springframework.boot.web.embedded.undertow.UndertowServletWebServerFa
 import org.springframework.boot.web.server.WebServerFactoryCustomizer;
 import org.springframework.context.annotation.Configuration;
 
-/***
+/**
  * Undertow的配置文件
  * 拦截 CONNECT TRACE TRACK 请求
  * 禁止外部尝试用服务做代理

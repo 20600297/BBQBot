@@ -1,3 +1,13 @@
+#线程池
+async:
+  executor:
+    thread:
+      core_pool_size: 6
+      max_pool_size: 20
+      queue_capacity: 80
+      name:
+        prefix: async-
+
 spring:
   #数据源配置
   datasource:
