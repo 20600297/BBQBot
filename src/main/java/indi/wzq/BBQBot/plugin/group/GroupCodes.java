@@ -30,7 +30,7 @@ public class GroupCodes {
         }
 
         // 获取签到用户id
-        Long signUserId = bot.getLoginInfo().getData().getUserId();
+        Long signUserId = event.getUserId();
 
         // 通过签到用户id获取用户信息
         UserInfo userInfo = userInfoService.findUserInfoByUserId(signUserId);

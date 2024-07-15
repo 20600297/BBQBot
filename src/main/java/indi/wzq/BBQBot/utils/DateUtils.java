@@ -29,7 +29,7 @@ public class DateUtils {
      * @return 布尔值
      */
     public static boolean isSameDay(Date date1,Date date2){
-        return  format(date1,parsePatterns[1]).equals(format(date2,parsePatterns[1]));
+        return  format(date1,parsePatterns[0]).equals(format(date2,parsePatterns[0]));
     }
 
     /**
