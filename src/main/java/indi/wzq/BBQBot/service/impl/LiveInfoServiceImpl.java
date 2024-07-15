@@ -13,7 +13,7 @@ import java.util.Map;
 
 @Service
 public class LiveInfoServiceImpl implements LiveInfoService {
-    private final LiveInfoRepository liveInfoRepository = SpringUtils.getBean(LiveInfoRepository.class);
+    private static final LiveInfoRepository liveInfoRepository = SpringUtils.getBean(LiveInfoRepository.class);
 
     /**
      * 获取所有房间号

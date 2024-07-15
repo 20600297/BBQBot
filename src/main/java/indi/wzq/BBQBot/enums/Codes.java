@@ -8,6 +8,7 @@ import lombok.Getter;
 @Getter
 public enum Codes {
     LIVE_SUBSCRIBE("^订阅直播间"),
+    GROUP_SIGNIN("^签到"),
     ;
 
     private String str;
