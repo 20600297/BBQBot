@@ -55,7 +55,7 @@ public class BilibiliCodes {
             long botId = bot.getLoginInfo().getData().getUserId();
 
             // 判断是否已经订阅
-            if( liveSubscribeService.existsByBotIdAndRoomId(botId,room_id) ){
+            if( liveSubscribeService.existsByGroupIdAndRoomId(botId,room_id) ){
                 bot.sendMsg(event, "订阅失败！\r\n%s 已经被订阅了呢。".formatted(room_id), false);
                 return;
             }

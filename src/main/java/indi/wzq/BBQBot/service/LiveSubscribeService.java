@@ -21,10 +21,10 @@ public interface LiveSubscribeService {
 
     /**
      * 通过BotId和RoomId判断是否存在订阅
-     * @param bot_id BotID
+     * @param group_id BotID
      * @param room_id 直播id
      * @return 是否存在的布尔值
      */
-    boolean existsByBotIdAndRoomId(long bot_id,String room_id);
+    boolean existsByGroupIdAndRoomId(long group_id, String room_id);
 
 }

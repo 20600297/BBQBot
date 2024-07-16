@@ -10,6 +10,6 @@ public interface LiveSubscribeRepository extends JpaRepository<LiveSubscribe,Lon
 
     List<LiveSubscribe> findAllByRoomId(String room_id);
 
-    boolean existsByBotIdAndRoomId(long bot_id,String room_id);
+    boolean existsByGroupIdAndRoomId(long group_id, String room_id);
 
 }

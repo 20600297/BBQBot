@@ -60,11 +60,6 @@ public class TaskBilibiliLiveStatus {
                         liveInfoService.updateLiveInfoByRoomId(roomId,-2);
                     }
                 }
-                if (statusCode == 1) {
-                    // 触发开播事件
-                    BilibiliCodes.liveStart(roomId);
-                }
-
             }
         }
     }
