@@ -122,4 +122,40 @@ public class BilibiliCodes {
                     .sendGroupMsg(subscribe.getGroupId(), msg, true);
         }
     }
+
+    public static void liveStop(String room_id){
+        // 更新状态码
+        liveInfoService.updateLiveInfoByRoomId(room_id,0);
+
+        // 获取直播间信息
+        LiveInfo liveInfo = BilibiliUtils.getLiveInfoByRoomId(room_id);
+
+        // 获取所有订阅此直播间的订阅信息
+        List<LiveSubscribe> allSubscribe = liveSubscribeService.findAllByRoomId(room_id);
+
+        // 判断是否正常获取直播间信息
+        if(liveInfo == null){
+            liveInfo = liveInfoService.findLiveInfoByRoomID(room_id);
+        }
+
+        Integer startDate = BilibiliUtils.getStartTimeByRoomId(room_id);
+
+        long nowDate = System.currentTimeMillis() / 1000;
+
+        int hour = (int) ( (nowDate - startDate) / 3600 );
+
+        // 构建下播提醒消息
+        String msg = Msg.builder().text(liveInfo.getUname() + " 下播了！\r\n")
+                .img(liveInfo.getCover())
+                .text("今天播了 " + hour + "个小时呢！")
+                .build();
+
+        // 遍历所有订阅此直播的订阅信息
+        for (LiveSubscribe subscribe : allSubscribe){
+            // 发送推送信息
+            botContainer.robots.get(subscribe.getBotId())
+                    .sendGroupMsg(subscribe.getGroupId(), msg, true);
+        }
+
+    }
 }

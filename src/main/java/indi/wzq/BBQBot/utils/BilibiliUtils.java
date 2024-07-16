@@ -60,4 +60,25 @@ public class BilibiliUtils {
         }
     }
 
+
+    /**
+     * 通过房间id获取开播时间
+     * @param room_id 房间id
+     * @return 开播时间戳
+     */
+    public static Integer getStartTimeByRoomId(String room_id){
+
+        HttpUtils.Body body = HttpUtils.sendGet("https://api.live.bilibili.com/xlive/web-room/v1/index/getInfoByRoom", "room_id=" + room_id);
+
+        if (JSONObject.parseObject(body.getBody()).getInteger("code") == 0) {
+
+            return JSONObject.parseObject(body.getBody()).getJSONObject("data")
+                    .getJSONObject("room_info").getInteger("live_start_time");
+        } else {
+
+            System.out.println(room_id + "：直播间状态异常");
+            return -2;
+
+        }
+    }
 }

@@ -47,7 +47,7 @@ public class TaskBilibiliLiveStatus {
                 //TODO 完善直播间状态变化提示
                 switch (statusCode) {
                     // 下播事件
-                    case  0 -> liveInfoService.updateLiveInfoByRoomId(roomId,0);
+                    case  0 -> BilibiliCodes.liveStop(roomId);
                     // 开播事件
                     case  1 -> BilibiliCodes.liveStart(roomId);
                     // 轮播事件
