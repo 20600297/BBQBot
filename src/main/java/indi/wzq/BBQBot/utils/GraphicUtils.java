@@ -8,12 +8,13 @@ import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Date;
 
 public class GraphicUtils {
 
+    private static final Font customFont = getFontByClasspath("/font/FeiBo.otf");
 
     /**
      * 绘制签到返回图像
@@ -24,9 +25,6 @@ public class GraphicUtils {
      */
     public static BufferedImage graphicSignInMsg(String background_url,String user_face_url,String user_name){
         try {
-
-            Font customFont = Font.createFont(Font.TRUETYPE_FONT, new FileInputStream("static/font/FeiBo.otf"));
-
 
             // 背景图像
             File backgroundImageFile = new File(background_url);
@@ -82,7 +80,7 @@ public class GraphicUtils {
 
             return backgroundImage;
 
-        } catch (IOException | FontFormatException e) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
@@ -184,13 +182,7 @@ public class GraphicUtils {
         // 计算水平居中的x坐标
         int x = (int) (original_image.getWidth() - bounds.getWidth()) / 2;
 
-        // 注意：LineMetrics提供了对字体行高的更精确控制
-        LineMetrics metrics = finalFont.getLineMetrics(copyright, frc);
-        float ascent = metrics.getAscent(); // 文本基线以上的部分
-        float descent = metrics.getDescent(); // 文本基线以下的部分
-        float leading = metrics.getLeading(); // 行间距
-        float totalHeight = ascent + descent + leading;
-        int y = original_image.getHeight() - (int) (totalHeight) + 5;
+        int y = getBottomFountY(original_image, finalFont, frc, copyright);
 
         g2d.drawString(copyright, x, y);
     }
@@ -215,14 +207,49 @@ public class GraphicUtils {
         int x = (int) (original_image.getWidth() - bounds.getWidth() - 20);
 
         // 注意：LineMetrics提供了对字体行高的更精确控制
-        LineMetrics metrics = finalFont.getLineMetrics(date, frc);
+        int y = getBottomFountY(original_image, finalFont, frc, date);
+
+        g2d.drawString(date, x, y);
+    }
+
+    /**
+     * 获取底部文字绘制y坐标
+     * @param original_image 原始图像
+     * @param finalFont 字体
+     * @param frc 绘制
+     * @param str 内容
+     * @return y值
+     */
+    private static int getBottomFountY(BufferedImage original_image, Font finalFont ,FontRenderContext frc, String str){
+        LineMetrics metrics = finalFont.getLineMetrics(str, frc);
         float ascent = metrics.getAscent(); // 文本基线以上的部分
         float descent = metrics.getDescent(); // 文本基线以下的部分
         float leading = metrics.getLeading(); // 行间距
         float totalHeight = ascent + descent + leading;
-        int y = original_image.getHeight() - (int) (totalHeight) + 5;
+        return original_image.getHeight() - (int) (totalHeight) + 5;
+    }
 
-        g2d.drawString(date, x, y);
+    /**
+     * 通过字体文件类路径加载字体
+     * @param path 字体文件类路径
+     * @return 字体文件
+     */
+    private static Font getFontByClasspath(String path){
+        try {
+
+            InputStream inputStream = GraphicUtils.class.getResourceAsStream(path);
+
+            if (inputStream == null) {
+                return new Font("Arial", Font.BOLD, 16);
+            }
+
+            Font font = Font.createFont(Font.TRUETYPE_FONT, inputStream);
+            inputStream.close();
+
+            return font;
+        } catch (IOException | FontFormatException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
