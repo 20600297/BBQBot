@@ -138,11 +138,9 @@ public class BilibiliCodes {
             liveInfo = liveInfoService.findLiveInfoByRoomID(room_id);
         }
 
-        Integer startDate = BilibiliUtils.getStartTimeByRoomId(room_id);
-
-        long nowDate = System.currentTimeMillis() / 1000;
-
-        int hour = (int) ( (nowDate - startDate) / 3600 );
+        long startDate = 1721131967;
+        long nowDate = (System.currentTimeMillis() / 1000);
+        long hour = ((nowDate - startDate) / 3600 );
 
         // 构建下播提醒消息
         String msg = Msg.builder().text(liveInfo.getUname() + " 下播了！\r\n")

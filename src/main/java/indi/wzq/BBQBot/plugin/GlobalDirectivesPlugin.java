@@ -46,6 +46,8 @@ public class GlobalDirectivesPlugin {
             switch (codes) {
                 case LIVE_SUBSCRIBE -> BilibiliCodes.subscribe(bot,event);
                 case GROUP_SIGNIN -> GroupCodes.signIn(bot,event);
+                case GROUP_DAILYNEWS -> GroupCodes.DailyNews(bot,event);
+                case GROUP_SUBSCRIBE_DAILYNEWS -> GroupCodes.subscribeDailyNews(bot,event);
             }
         });
     }

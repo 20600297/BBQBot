@@ -1,9 +1,12 @@
 package indi.wzq.BBQBot.plugin.group;
 
+import com.alibaba.fastjson2.JSONObject;
 import com.mikuac.shiro.constant.ActionParams;
 import com.mikuac.shiro.core.Bot;
 import com.mikuac.shiro.dto.event.message.AnyMessageEvent;
 import indi.wzq.BBQBot.entity.group.UserInfo;
+import indi.wzq.BBQBot.service.GroupInfoService;
+import indi.wzq.BBQBot.service.GroupTaskService;
 import indi.wzq.BBQBot.service.UserInfoService;
 import indi.wzq.BBQBot.utils.DateUtils;
 import indi.wzq.BBQBot.utils.GraphicUtils;
@@ -25,6 +28,11 @@ import java.util.Date;
 public class GroupCodes {
 
     private static final UserInfoService userInfoService = SpringUtils.getBean(UserInfoService.class);
+
+    private static final GroupInfoService groupInfoService = SpringUtils.getBean(GroupInfoService.class);
+
+    private static final GroupTaskService groupTaskService = SpringUtils.getBean(GroupTaskService.class);
+
 
     /**
      * 用户签到事件
@@ -136,6 +144,40 @@ public class GroupCodes {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * 订阅每日早报事件
+     * @param bot Bot
+     * @param event Event
+     */
+    public static void subscribeDailyNews(Bot bot, AnyMessageEvent event) {
+        groupTaskService.updateDailyNewsByGroupId(event.getGroupId(), true);
+
+        groupInfoService.creatGroupInfo(event.getGroupId(),event.getUserId());
+
+        String msg = Msg.builder()
+                .text("每日早报-订阅成功")
+                .build();
+
+        bot.sendMsg(event, msg, false);
+    }
+
+    /**
+     * 今日早报事件
+     * @param bot Bot
+     * @param event Event
+     */
+    public static void DailyNews(Bot bot, AnyMessageEvent event) {
+        HttpUtils.Body body = HttpUtils.sendGet("http://dwz.2xb.cn/zaob", "");
+
+        String url = JSONObject.parseObject(body.getBody()).getString("imageUrl");
+
+        String msg = Msg.builder()
+                .img(url)
+                .build();
+
+        bot.sendMsg(event, msg, true);
     }
 
     /**
