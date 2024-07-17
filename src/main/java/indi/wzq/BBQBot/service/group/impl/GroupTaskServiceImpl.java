@@ -1,8 +1,8 @@
-package indi.wzq.BBQBot.service.impl;
+package indi.wzq.BBQBot.service.group.impl;
 
 import indi.wzq.BBQBot.entity.group.GroupTask;
 import indi.wzq.BBQBot.repo.GroupTaskRepository;
-import indi.wzq.BBQBot.service.GroupTaskService;
+import indi.wzq.BBQBot.service.group.GroupTaskService;
 import indi.wzq.BBQBot.utils.SpringUtils;
 import org.springframework.stereotype.Service;
 

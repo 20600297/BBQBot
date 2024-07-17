@@ -1,4 +1,4 @@
-package indi.wzq.BBQBot.service;
+package indi.wzq.BBQBot.service.user;
 
 import indi.wzq.BBQBot.entity.group.UserInfo;
 

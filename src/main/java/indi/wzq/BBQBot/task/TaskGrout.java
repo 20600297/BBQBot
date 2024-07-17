@@ -2,9 +2,8 @@ package indi.wzq.BBQBot.task;
 
 import com.alibaba.fastjson2.JSONObject;
 import com.mikuac.shiro.core.BotContainer;
-import indi.wzq.BBQBot.repo.GroupTaskRepository;
-import indi.wzq.BBQBot.service.GroupInfoService;
-import indi.wzq.BBQBot.service.GroupTaskService;
+import indi.wzq.BBQBot.service.group.GroupInfoService;
+import indi.wzq.BBQBot.service.group.GroupTaskService;
 import indi.wzq.BBQBot.utils.SpringUtils;
 import indi.wzq.BBQBot.utils.http.HttpUtils;
 import indi.wzq.BBQBot.utils.onebot.Msg;

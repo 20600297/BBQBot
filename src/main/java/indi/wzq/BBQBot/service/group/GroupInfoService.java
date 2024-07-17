@@ -1,4 +1,4 @@
-package indi.wzq.BBQBot.service;
+package indi.wzq.BBQBot.service.group;
 
 public interface GroupInfoService {
 

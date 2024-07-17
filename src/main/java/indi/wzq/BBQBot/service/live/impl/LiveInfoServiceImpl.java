@@ -1,8 +1,8 @@
-package indi.wzq.BBQBot.service.impl;
+package indi.wzq.BBQBot.service.live.impl;
 
 import indi.wzq.BBQBot.entity.bilibili.LiveInfo;
 import indi.wzq.BBQBot.repo.LiveInfoRepository;
-import indi.wzq.BBQBot.service.LiveInfoService;
+import indi.wzq.BBQBot.service.live.LiveInfoService;
 import indi.wzq.BBQBot.utils.SpringUtils;
 import org.springframework.stereotype.Service;
 

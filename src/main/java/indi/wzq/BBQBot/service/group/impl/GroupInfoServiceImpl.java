@@ -1,8 +1,8 @@
-package indi.wzq.BBQBot.service.impl;
+package indi.wzq.BBQBot.service.group.impl;
 
 import indi.wzq.BBQBot.entity.group.GroupInfo;
 import indi.wzq.BBQBot.repo.GroupInfoRepository;
-import indi.wzq.BBQBot.service.GroupInfoService;
+import indi.wzq.BBQBot.service.group.GroupInfoService;
 import indi.wzq.BBQBot.utils.SpringUtils;
 import org.springframework.stereotype.Service;
 
