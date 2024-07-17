@@ -138,7 +138,7 @@ public class BilibiliCodes {
             liveInfo = liveInfoService.findLiveInfoByRoomID(room_id);
         }
 
-        long startDate = 1721131967;
+        long startDate = BilibiliUtils.getStartTimeByRoomId(room_id);
         long nowDate = (System.currentTimeMillis() / 1000);
         long hour = ((nowDate - startDate) / 3600 );
 
