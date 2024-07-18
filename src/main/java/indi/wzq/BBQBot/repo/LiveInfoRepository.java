@@ -18,4 +18,6 @@ public interface LiveInfoRepository extends JpaRepository<LiveInfo,String> , Jpa
     @Query("SELECT l.status FROM LiveInfo l WHERE l.roomId = :room_id")
     Integer findStatusByRoomId(@Param("room_id") String room_id);
 
+    @Query("SELECT l.startTime FROM LiveInfo l WHERE l.roomId = :room_id")
+    long findStartTimeByRoomId(String room_id);
 }

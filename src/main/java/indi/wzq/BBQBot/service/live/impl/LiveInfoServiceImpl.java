@@ -69,4 +69,10 @@ public class LiveInfoServiceImpl implements LiveInfoService {
         liveInfoRepository.save(liveInfo);
     }
 
+    @Override
+    public long findStartTimeByRoomId(String room_id) {
+
+        return liveInfoRepository.findStartTimeByRoomId(room_id);
+    }
+
 }

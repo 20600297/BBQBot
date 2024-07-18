@@ -32,4 +32,7 @@ public class LiveInfo {
     // 直播间状态
     Integer status;
 
+    // 开播时间
+    Long startTime;
+
 }

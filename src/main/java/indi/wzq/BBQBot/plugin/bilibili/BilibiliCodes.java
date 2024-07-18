@@ -5,7 +5,7 @@ import com.mikuac.shiro.core.Bot;
 import com.mikuac.shiro.core.BotContainer;
 import com.mikuac.shiro.dto.event.message.AnyMessageEvent;
 import indi.wzq.BBQBot.entity.bilibili.LiveInfo;
-import indi.wzq.BBQBot.entity.group.LiveSubscribe;
+import indi.wzq.BBQBot.entity.bilibili.LiveSubscribe;
 import indi.wzq.BBQBot.enums.Codes;
 import indi.wzq.BBQBot.service.live.LiveInfoService;
 import indi.wzq.BBQBot.service.live.LiveSubscribeService;
@@ -95,8 +95,6 @@ public class BilibiliCodes {
      * @param room_id 直播id
      */
     public static void liveStart(String room_id){
-        // 更新状态码
-        liveInfoService.updateLiveInfoByRoomId(room_id,1);
 
         // 获取直播间信息
         LiveInfo liveInfo = BilibiliUtils.getLiveInfoByRoomId(room_id);
@@ -107,7 +105,12 @@ public class BilibiliCodes {
         // 判断是否正常获取直播间信息
         if(liveInfo == null){
             liveInfo = liveInfoService.findLiveInfoByRoomID(room_id);
+            liveInfo.setStatus(1);
+            liveInfo.setStartTime(BilibiliUtils.getStartTimeByRoomId(room_id));
         }
+
+        // 更新 状态码 开播时间
+        liveInfoService.saveLiveInfo(liveInfo);
 
         // 构建开播提醒消息
         String msg = Msg.builder().text(liveInfo.getUname() + " 开播了！\r\n")
@@ -128,8 +131,6 @@ public class BilibiliCodes {
      * @param room_id 直播id
      */
     public static void liveStop(String room_id){
-        // 更新状态码
-        liveInfoService.updateLiveInfoByRoomId(room_id,0);
 
         // 获取直播间信息
         LiveInfo liveInfo = BilibiliUtils.getLiveInfoByRoomId(room_id);
@@ -142,7 +143,8 @@ public class BilibiliCodes {
             liveInfo = liveInfoService.findLiveInfoByRoomID(room_id);
         }
 
-        long startDate = BilibiliUtils.getStartTimeByRoomId(room_id);
+
+        long startDate = liveInfoService.findStartTimeByRoomId(room_id);
         long nowDate = (System.currentTimeMillis() / 1000);
         long hour = ((nowDate - startDate) / 3600 );
 
@@ -151,6 +153,11 @@ public class BilibiliCodes {
                 .img(liveInfo.getCover())
                 .text("今天播了 " + hour + "个小时呢！")
                 .build();
+
+        // 更新 状态码 开播时间
+        liveInfo.setStatus(0);
+        liveInfo.setStartTime(0L);
+        liveInfoService.saveLiveInfo(liveInfo);
 
         // 遍历所有订阅此直播的订阅信息
         for (LiveSubscribe subscribe : allSubscribe){

@@ -26,9 +26,9 @@ public class BilibiliUtils {
             String face = base_info.getString("face");
             String title = room_info.getString("title");
             String cover = room_info.getString("cover");
-            Integer status = room_info.getInteger("live_status");
-
-            return new LiveInfo(room_id,uname,face,title,cover,status);
+            Integer live_status = room_info.getInteger("live_status");
+            Long live_start_time = room_info.getLong("live_start_time");
+            return new LiveInfo(room_id,uname,face,title,cover,live_status,live_start_time);
         } else {
             System.out.println(room_id + "：直播间状态异常");
             return null;
@@ -62,18 +62,18 @@ public class BilibiliUtils {
      * @param room_id 房间id
      * @return 开播时间戳
      */
-    public static Integer getStartTimeByRoomId(String room_id){
+    public static Long getStartTimeByRoomId(String room_id){
 
         HttpUtils.Body body = HttpUtils.sendGet("https://api.live.bilibili.com/xlive/web-room/v1/index/getInfoByRoom", "room_id=" + room_id);
         JSONObject jsonObject = JSONObject.parseObject(body.getBody());
         if (jsonObject.getInteger("code") == 0) {
 
             return jsonObject.getJSONObject("data")
-                    .getJSONObject("room_info").getInteger("live_start_time");
+                    .getJSONObject("room_info").getLong("live_start_time");
         } else {
 
             System.out.println(room_id + "：直播间状态异常");
-            return -2;
+            return 0L;
 
         }
     }

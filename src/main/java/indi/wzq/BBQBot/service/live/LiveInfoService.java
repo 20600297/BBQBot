@@ -39,4 +39,5 @@ public interface LiveInfoService {
      */
     void updateLiveInfoByRoomId(String room_id , Integer status_code);
 
+    long findStartTimeByRoomId(String room_id);
 }
