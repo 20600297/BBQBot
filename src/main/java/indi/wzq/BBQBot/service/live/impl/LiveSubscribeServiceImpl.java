@@ -1,6 +1,6 @@
 package indi.wzq.BBQBot.service.live.impl;
 
-import indi.wzq.BBQBot.entity.group.LiveSubscribe;
+import indi.wzq.BBQBot.entity.bilibili.LiveSubscribe;
 import indi.wzq.BBQBot.repo.LiveSubscribeRepository;
 import indi.wzq.BBQBot.service.live.LiveSubscribeService;
 import indi.wzq.BBQBot.utils.SpringUtils;

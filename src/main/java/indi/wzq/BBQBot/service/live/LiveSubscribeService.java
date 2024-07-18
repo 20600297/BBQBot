@@ -1,6 +1,6 @@
 package indi.wzq.BBQBot.service.live;
 
-import indi.wzq.BBQBot.entity.group.LiveSubscribe;
+import indi.wzq.BBQBot.entity.bilibili.LiveSubscribe;
 
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package indi.wzq.BBQBot.entity.group;
+package indi.wzq.BBQBot.entity.bilibili;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Entity;
