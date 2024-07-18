@@ -29,7 +29,7 @@ public class GlobalDirectivesPlugin {
         if (CqMatcher.isCqAt(raw)) {
             CqParse build = CqParse.build(raw);
             if (build.getCqAt().get(0).equals(bot.getSelfId())) {
-                raw = build.reovmCq().trim();
+                raw = build.removeCq().trim();
             }
         }
 

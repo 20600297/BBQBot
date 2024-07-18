@@ -9,13 +9,10 @@ import okhttp3.*;
 import org.jetbrains.annotations.NotNull;
 
 import javax.net.ssl.*;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
-import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -111,9 +108,7 @@ public class HttpUtils {
             body.setHeaders(response.headers());
 
             response.close();
-        }, () -> {
-            body.setCode(HttpCodeEnum.getCode(response.code()));
-        });
+        }, () -> body.setCode(HttpCodeEnum.getCode(response.code())));
         response.close();
         return body;
     }
@@ -134,9 +129,7 @@ public class HttpUtils {
             body.setHeaders(response.headers());
 
             response.close();
-        }, () -> {
-            body.setCode(HttpCodeEnum.getCode(response.code()));
-        });
+        }, () -> body.setCode(HttpCodeEnum.getCode(response.code())));
         response.close();
         return body;
     }
@@ -157,12 +150,12 @@ public class HttpUtils {
     public static X509TrustManager getX509TrustManager() {
         return new X509TrustManager() {
             @Override
-            public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+            public void checkServerTrusted(X509Certificate[] chain, String authType) {
 
             }
 
             @Override
-            public void checkClientTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
+            public void checkClientTrusted(X509Certificate[] x509Certificates, String s) {
 
             }
 

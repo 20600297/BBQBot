@@ -1,5 +1,6 @@
 package indi.wzq.BBQBot.utils;
 
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
@@ -20,7 +21,7 @@ public class SpringUtils implements BeanFactoryPostProcessor, ApplicationContext
      * 获取对象
      *
      * @return Object 一个以所给名字注册的bean的实例
-     * @throws BeansException
+     * @throws BeansException Bean对象
      */
     @SuppressWarnings("unchecked")
     public static <T> T getBean(String name) throws BeansException {
@@ -30,20 +31,20 @@ public class SpringUtils implements BeanFactoryPostProcessor, ApplicationContext
     /**
      * 获取类型为requiredType的对象
      *
-     * @throws BeansException
+     * @throws BeansException Bean对象
      */
     public static <T> T getBean(Class<T> clz) throws BeansException {
         return beanFactory.getBean(clz);
     }
 
     @Override
-    public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
+    public void postProcessBeanFactory(@NotNull ConfigurableListableBeanFactory beanFactory) throws BeansException {
         SpringUtils.beanFactory = beanFactory;
 
     }
 
     @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+    public void setApplicationContext(@NotNull ApplicationContext applicationContext) throws BeansException {
         SpringUtils.applicationContext = applicationContext;
 
     }

@@ -92,7 +92,7 @@ public class MatcherUtils {
      *
      * @param str   字符串
      * @param regex 正则表达式
-     * @return
+     * @return 布尔值
      */
     public static boolean regexG(String str, String regex) {
         Pattern p = Pattern.compile(regex);
@@ -120,12 +120,12 @@ public class MatcherUtils {
     /**
      * 正则匹配特殊符号
      *
-     * @param str
-     * @return
+     * @param str 匹配字符串
+     * @return 布尔值
      */
     public static boolean isSpecialSymbols(String str) {
         String regex = "[" +
-                "\\!@#$%^&*()_+" +
+                "!@#$%^&*()_+" +
                 "\\-=\\[\\]{};':\"\\\\|,.<>/?`~" +
                 "]";
         Pattern p = Pattern.compile(regex);
@@ -140,7 +140,7 @@ public class MatcherUtils {
      * 对于携带特殊字符的字符串进行过滤
      */
     public static String isOrderItem(String str) {
-        Pattern p = Pattern.compile("([一-龥]+) ?\\& ?([一-龥]+)");
+        Pattern p = Pattern.compile("([一-龥]+) ?& ?([一-龥]+)");
         Matcher m = p.matcher(str);
         while (m.find()) {
             return m.group();

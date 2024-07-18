@@ -6,8 +6,6 @@ import indi.wzq.BBQBot.utils.http.HttpUtils;
 
 public class BilibiliUtils {
 
-    //TODO:Bilibili信息获取代码优化
-
     /**
      * 通过房间id获取直播间信息
      * @param room_id 房间id
@@ -16,20 +14,18 @@ public class BilibiliUtils {
     public static LiveInfo getLiveInfoByRoomId(String room_id){
         HttpUtils.Body body = HttpUtils.sendGet("https://api.live.bilibili.com/xlive/web-room/v1/index/getInfoByRoom", "room_id=" + room_id);
 
-        if (JSONObject.parseObject(body.getBody()).getInteger("code") == 0) {
+        JSONObject jsonObject = JSONObject.parseObject(body.getBody());
 
-            JSONObject anchor_info = JSONObject.parseObject(body.getBody()).getJSONObject("data").getJSONObject("anchor_info");
+        if (jsonObject.getInteger("code") == 0) {
 
-            JSONObject room_info = JSONObject.parseObject(body.getBody()).getJSONObject("data").getJSONObject("room_info");
+            JSONObject data = jsonObject.getJSONObject("data");
+            JSONObject base_info = data.getJSONObject("anchor_info").getJSONObject("base_info");
+            JSONObject room_info = data.getJSONObject("room_info");
 
-            String uname = anchor_info.getJSONObject("base_info").getString("uname");
-
-            String face = anchor_info.getJSONObject("base_info").getString("face");
-
+            String uname = base_info.getString("uname");
+            String face = base_info.getString("face");
             String title = room_info.getString("title");
-
             String cover = room_info.getString("cover");
-
             Integer status = room_info.getInteger("live_status");
 
             return new LiveInfo(room_id,uname,face,title,cover,status);
@@ -47,10 +43,10 @@ public class BilibiliUtils {
     public static Integer getLiveStatusByRoomId(String room_id){
 
         HttpUtils.Body body = HttpUtils.sendGet("https://api.live.bilibili.com/xlive/web-room/v1/index/getInfoByRoom", "room_id=" + room_id);
+        JSONObject jsonObject = JSONObject.parseObject(body.getBody());
+        if (jsonObject.getInteger("code") == 0) {
 
-        if (JSONObject.parseObject(body.getBody()).getInteger("code") == 0) {
-
-            return JSONObject.parseObject(body.getBody()).getJSONObject("data")
+            return jsonObject.getJSONObject("data")
                     .getJSONObject("room_info").getInteger("live_status");
         } else {
 
@@ -69,10 +65,10 @@ public class BilibiliUtils {
     public static Integer getStartTimeByRoomId(String room_id){
 
         HttpUtils.Body body = HttpUtils.sendGet("https://api.live.bilibili.com/xlive/web-room/v1/index/getInfoByRoom", "room_id=" + room_id);
+        JSONObject jsonObject = JSONObject.parseObject(body.getBody());
+        if (jsonObject.getInteger("code") == 0) {
 
-        if (JSONObject.parseObject(body.getBody()).getInteger("code") == 0) {
-
-            return JSONObject.parseObject(body.getBody()).getJSONObject("data")
+            return jsonObject.getJSONObject("data")
                     .getJSONObject("room_info").getInteger("live_start_time");
         } else {
 
@@ -81,4 +77,5 @@ public class BilibiliUtils {
 
         }
     }
+
 }

@@ -43,7 +43,7 @@ public class CqParse {
         Matcher m = p.matcher(CQ);
         List<String> ids = new ArrayList<>();
         while (m.find()) {
-            Pattern pa = Pattern.compile("[a-zA-Z]+://[^\\s]*term");
+            Pattern pa = Pattern.compile("[a-zA-Z]+://\\S*term");
             Matcher ma = pa.matcher(m.group());
             while (ma.find()) {
                 ids.add(ma.group());
@@ -51,24 +51,6 @@ public class CqParse {
         }
         return ids;
     }
-
-    /**
-     * 获取图片的MD5
-     *
-     * @return MD5集合
-     */
-/*
-    public List<String> getCqImageMD5() {
-        Pattern p = Pattern.compile("CQ:image,file=(.*?),");
-        Matcher m = p.matcher(CQ);
-        List<String> ids = new ArrayList<>();
-        while (m.find()) {
-            ids.add(StringUtils.getSubString(m.group(), "file=", ".image,"));
-        }
-        return ids;
-    }
-*/
-
 
     /**
      * 获取AT
@@ -95,8 +77,8 @@ public class CqParse {
      * @return 清除之后的文本
      */
 
-    public String reovmCq() {
-        return CQ.replaceAll("\\[(.*?)\\]", "");
+    public String removeCq() {
+        return CQ.replaceAll("\\[(.*?)]", "");
     }
 
 }

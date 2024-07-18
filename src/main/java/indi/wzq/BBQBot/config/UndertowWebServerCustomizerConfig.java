@@ -1,7 +1,5 @@
 package indi.wzq.BBQBot.config;
 
-import io.undertow.server.HandlerWrapper;
-import io.undertow.server.HttpHandler;
 import io.undertow.server.handlers.DisallowedMethodsHandler;
 import io.undertow.util.HttpString;
 import org.springframework.boot.web.embedded.undertow.UndertowServletWebServerFactory;
@@ -18,22 +16,16 @@ public class UndertowWebServerCustomizerConfig implements WebServerFactoryCustom
 
     @Override
     public void customize(UndertowServletWebServerFactory factory) {
-        factory.addDeploymentInfoCustomizers(deploymentInfo -> {
-            deploymentInfo.addInitialHandlerChainWrapper(new HandlerWrapper() {
+        factory.addDeploymentInfoCustomizers(deploymentInfo -> deploymentInfo.addInitialHandlerChainWrapper(handler -> {
 
-                @Override
-                public HttpHandler wrap(HttpHandler handler) {
-
-                    //禁止三个方法TRACE也是不安全的
-                    System.out.println("disable HTTP methods: CONNECT/TRACE/TRACK");
-                    HttpString[] disallowedHttpMethods = {
-                            HttpString.tryFromString("CONNECT"),
-                            HttpString.tryFromString("TRACE"),
-                            HttpString.tryFromString("TRACK")
-                    };
-                    return new DisallowedMethodsHandler(handler, disallowedHttpMethods);
-                }
-            });
-        });
+            //禁止三个方法TRACE也是不安全的
+            System.out.println("disable HTTP methods: CONNECT/TRACE/TRACK");
+            HttpString[] disallowedHttpMethods = {
+                    HttpString.tryFromString("CONNECT"),
+                    HttpString.tryFromString("TRACE"),
+                    HttpString.tryFromString("TRACK")
+            };
+            return new DisallowedMethodsHandler(handler, disallowedHttpMethods);
+        }));
     }
 }

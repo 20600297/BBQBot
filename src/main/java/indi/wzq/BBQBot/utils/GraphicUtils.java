@@ -14,7 +14,7 @@ import java.util.Date;
 
 public class GraphicUtils {
 
-    private static final Font customFont = getFontByClasspath("/font/FeiBo.otf");
+    private static final Font customFont = getFontByClasspath("/font/MaoKenYuanZhuTi.ttf");
 
     /**
      * 绘制签到返回图像
@@ -273,21 +273,4 @@ public class GraphicUtils {
         }
     }
 
-    /**
-     * 判断图片是否正常
-     * @param image_path 本地路径
-     * @return 布尔值
-     */
-    public static boolean isNull(String image_path) {
-        try {
-            // 使用ImageIO读取图片文件
-            File file = new File(image_path);
-            BufferedImage image = ImageIO.read(file);
-
-            return image == null;
-
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
 }

@@ -123,6 +123,10 @@ public class BilibiliCodes {
         }
     }
 
+    /**
+     * 下播事件
+     * @param room_id 直播id
+     */
     public static void liveStop(String room_id){
         // 更新状态码
         liveInfoService.updateLiveInfoByRoomId(room_id,0);

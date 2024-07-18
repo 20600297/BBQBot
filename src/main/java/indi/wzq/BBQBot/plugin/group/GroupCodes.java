@@ -9,6 +9,7 @@ import indi.wzq.BBQBot.service.group.GroupInfoService;
 import indi.wzq.BBQBot.service.group.GroupTaskService;
 import indi.wzq.BBQBot.service.user.UserInfoService;
 import indi.wzq.BBQBot.utils.DateUtils;
+import indi.wzq.BBQBot.utils.FileUtils;
 import indi.wzq.BBQBot.utils.GraphicUtils;
 import indi.wzq.BBQBot.utils.SpringUtils;
 import indi.wzq.BBQBot.utils.http.HttpUtils;
@@ -19,7 +20,6 @@ import okhttp3.Headers;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Date;
 
@@ -120,7 +120,7 @@ public class GroupCodes {
 
         // 确保文件夹存在
         if (!file.getParentFile().exists()) {
-            file.getParentFile().mkdirs();
+            if(file.getParentFile().mkdirs())log.info("签到图像保存文件夹构建异常！");
         }
 
         try {
@@ -189,31 +189,10 @@ public class GroupCodes {
                 ,"sort=pc"
                 , Headers.of("referer", "https://weibo.com/").newBuilder());
 
-        String directoryPath = "./data/img/Background/";
         String fileName = DateUtils.format(new Date(), "yyyy-MM-dd-HH_mm_ss") + "-bg.png";
-        String filePath = directoryPath + fileName;
 
-        // 创建 File 对象
-        File file = new File(filePath);
+        String filePath = FileUtils.saveImageFile(body.getFile(), "./data/img/Background/", fileName);
 
-        // 确保文件夹存在
-        if (!file.getParentFile().exists()) {
-            file.getParentFile().mkdirs();
-        }
-
-        // 使用 FileOutputStream 将二进制数据写入文件
-        try (FileOutputStream fos = new FileOutputStream(filePath)) {
-            fos.write(body.getFile()); // 将二进制数据写入文件
-        } catch (IOException e) {
-            e.printStackTrace();
-            log.info("保存图片 "+filePath+" 发生异常。");
-        }
-
-        // 判断图片是否正常
-        if ( GraphicUtils.isNull(filePath) ){
-            filePath = getBackground();
-
-        }
         // 判断大小是否合适
         if ( !GraphicUtils.isSuitable(filePath) ){
             return getBackground();
@@ -232,32 +211,8 @@ public class GroupCodes {
                 ,""
                 , Headers.of("*", "*").newBuilder());
 
-        // 指定要保存的图片文件名和路径
-        String directoryPath = "./data/img/QqFace/";
         String fileName = DateUtils.format(new Date(), "yyyy-MM-dd-HH_mm_ss") +"-"+ user_id + "-face.png";
-        String filePath = directoryPath + fileName;
 
-        // 创建 File 对象
-        File file = new File(filePath);
-
-        // 确保文件夹存在
-        if (!file.getParentFile().exists()) {
-            file.getParentFile().mkdirs();
-        }
-
-        // 使用 FileOutputStream 将二进制数据写入文件
-        try (FileOutputStream fos = new FileOutputStream(filePath)) {
-            fos.write(body.getFile()); // 将二进制数据写入文件
-        } catch (IOException e) {
-            e.printStackTrace();
-            log.info("保存图片 "+filePath+" 发生异常。");
-        }
-
-        // 判断图像是否正常
-        if( GraphicUtils.isNull(filePath) ){
-           return getQqFace(user_id);
-        }
-
-        return filePath;
+        return FileUtils.saveImageFile(body.getFile(), "./data/img/QqFace/", fileName);
     }
 }
