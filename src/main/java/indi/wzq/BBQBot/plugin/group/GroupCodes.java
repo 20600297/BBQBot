@@ -22,6 +22,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.Date;
+import java.util.Random;
 
 
 @Slf4j
@@ -59,8 +60,11 @@ public class GroupCodes {
         // 判断是否为初次签到
         if (userInfo == null) {
 
+            userInfo = creatUserInfo(signUserId);
             // 初始化用户信息
-            userInfo = new UserInfo(signUserId,signInTime,1,1,1);
+            userInfo.setSignInTime(signInTime);
+            userInfo.setSignInNum(1);
+            userInfo.setSignInContNum(1);
             userInfoService.saveUserInfo(userInfo);
 
             sendSignMsg(bot,event,userInfo);
@@ -181,6 +185,56 @@ public class GroupCodes {
     }
 
     /**
+     * 今日运势事件
+     * @param bot Bot
+     * @param event Event
+     */
+    public static void Fortune(Bot bot, AnyMessageEvent event){
+
+        UserInfo userInfo = userInfoService.findUserInfoByUserId(event.getUserId());
+        Random random = new Random();
+        String path = "/static/img/jrys/" + (random.nextInt(52) + 1) + ".png";
+        Date date = new Date();
+
+        if (userInfo == null) {
+
+            userInfo = creatUserInfo(event.getUserId());
+            userInfo.setFortuneTime(date);
+
+            // 初始化用户信息
+            userInfoService.saveUserInfo(userInfo);
+
+            String msg = Msg.builder()
+                    .at(event.getUserId())
+                    .text("今日运势")
+                    .imgBase64(FileUtils.readImageFile(path))
+                    .build();
+
+            bot.sendMsg(event, msg, true);
+
+
+        } else {
+            if (DateUtils.isYesterday(date,userInfo.getFortuneTime())) {
+                String msg = Msg.builder()
+                        .at(event.getUserId())
+                        .text("今日运势")
+                        .imgBase64(FileUtils.readImageFile(path))
+                        .build();
+
+                bot.sendMsg(event, msg, true);
+            } else {
+                String msg = Msg.builder()
+                        .at(event.getUserId())
+                        .text("每人一天限抽签1次呢！\r\n")
+                        .text("贪心的人是不会有好运的。")
+                        .build();
+
+                bot.sendMsg(event, msg, true);
+            }
+        }
+    }
+
+    /**
      * 获取签到的背景图片
      * @return 背景图片本地保存地址
      */
@@ -214,5 +268,9 @@ public class GroupCodes {
         String fileName = DateUtils.format(new Date(), "yyyy-MM-dd-HH_mm_ss") +"-"+ user_id + "-face.png";
 
         return FileUtils.saveImageFile(body.getFile(), "./data/img/QqFace/", fileName);
+    }
+
+    private static UserInfo creatUserInfo(long user_id){
+        return new UserInfo(user_id,new Date(0),new Date(0),0,0,1);
     }
 }

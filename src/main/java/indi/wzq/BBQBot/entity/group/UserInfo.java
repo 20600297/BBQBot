@@ -17,6 +17,8 @@ public class UserInfo {
     @Id
     Long userId;
 
+    Date fortuneTime;
+
     Date signInTime;
 
     Integer signInNum;

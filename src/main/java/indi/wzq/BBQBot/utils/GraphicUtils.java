@@ -14,7 +14,7 @@ import java.util.Date;
 
 public class GraphicUtils {
 
-    private static final Font customFont = getFontByClasspath("/font/MaoKenYuanZhuTi.ttf");
+    private static final Font customFont = getFontByClasspath("/static/font/MaoKenYuanZhuTi.ttf");
 
     /**
      * 绘制签到返回图像
@@ -71,7 +71,7 @@ public class GraphicUtils {
 
             g2d.drawString(DateUtils.getGreeting(), 175, 145);
 
-            writeCopyright(backgroundImage, "Creat By BBQBot v1.0.3");
+            writeCopyright(backgroundImage, "Creat By BBQBot v1.0.4");
 
             writeDate(backgroundImage,DateUtils.format(new Date(),"yyyy-MM-dd hh:mm:ss"));
 

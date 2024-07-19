@@ -9,6 +9,7 @@ import lombok.Getter;
 public enum Codes {
     LIVE_SUBSCRIBE("^订阅直播间"),
     GROUP_SIGNIN("^签到"),
+    GROUP_FORTUNE("^今日运势"),
     GROUP_DAILYNEWS("^今日早报"),
     GROUP_SUBSCRIBE_DAILYNEWS("^订阅每日早报")
     ;
