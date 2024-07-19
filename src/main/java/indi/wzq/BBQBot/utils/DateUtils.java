@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
 public class DateUtils {
@@ -34,18 +35,22 @@ public class DateUtils {
     }
 
     /**
-     * 判断时间2是否是时间1的前一天
+     * 判断date1是否是date2的昨天或更早
      * @param date1 时间1
      * @param date2 时间2
      * @return 布尔值
      */
-    public static boolean isYesterday(Date date1, Date date2) {
+    public static boolean isYesterdayOrEarlier(Date date1, Date date2) {
         // 将java.util.Date转换为java.time.LocalDate
         LocalDate localDate1 = date1.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
         LocalDate localDate2 = date2.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 
-        // 判断date1是否是date2的前一天
-        return localDate1.equals(localDate2.minusDays(1));
+        // 使用ChronoUnit.DAYS.between()来计算两个LocalDate之间的天数差
+        long daysBetween = ChronoUnit.DAYS.between(localDate1, localDate2);
+
+        // 判断date1是否是date2的昨天或更早
+        // 注意：daysBetween为正数表示localDate1在localDate2之前，负数表示在之后
+        return daysBetween >= 1;
     }
 
     /**

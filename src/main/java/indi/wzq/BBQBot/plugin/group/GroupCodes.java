@@ -86,7 +86,7 @@ public class GroupCodes {
             } else {
 
                 // 判断是否为连续签到
-                if (DateUtils.isYesterday(userInfo.getSignInTime(),signInTime)){
+                if (DateUtils.isYesterdayOrEarlier(userInfo.getSignInTime(),signInTime)){
                     userInfo.setSignInContNum(userInfo.getSignInContNum() + 1);
                 } else {
                     userInfo.setSignInContNum(1);
@@ -214,7 +214,7 @@ public class GroupCodes {
 
 
         } else {
-            if (DateUtils.isYesterday(date,userInfo.getFortuneTime())) {
+            if (DateUtils.isYesterdayOrEarlier(userInfo.getFortuneTime(),date)) {
                 String msg = Msg.builder()
                         .at(event.getUserId())
                         .text("今日运势")
