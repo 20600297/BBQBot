@@ -7,8 +7,8 @@ import com.mikuac.shiro.dto.event.message.AnyMessageEvent;
 import indi.wzq.BBQBot.entity.bilibili.LiveInfo;
 import indi.wzq.BBQBot.entity.bilibili.LiveSubscribe;
 import indi.wzq.BBQBot.enums.Codes;
-import indi.wzq.BBQBot.service.live.LiveInfoService;
-import indi.wzq.BBQBot.service.live.LiveSubscribeService;
+import indi.wzq.BBQBot.repo.LiveInfoRepository;
+import indi.wzq.BBQBot.repo.LiveSubscribeRepository;
 import indi.wzq.BBQBot.utils.BilibiliUtils;
 import indi.wzq.BBQBot.utils.SpringUtils;
 import indi.wzq.BBQBot.utils.onebot.Msg;
@@ -17,11 +17,12 @@ import java.util.List;
 
 public class BilibiliCodes {
 
+    private static final LiveSubscribeRepository liveSubscribeRepository = SpringUtils.getBean(LiveSubscribeRepository.class);
+
     private static final BotContainer botContainer = SpringUtils.getBean(BotContainer.class);
 
-    private static final LiveInfoService liveInfoService = SpringUtils.getBean(LiveInfoService.class);
+    private static final LiveInfoRepository liveInfoRepository = SpringUtils.getBean(LiveInfoRepository.class);
 
-    private static final LiveSubscribeService liveSubscribeService = SpringUtils.getBean(LiveSubscribeService.class);
 
     /**
      * 订阅事件
@@ -52,26 +53,27 @@ public class BilibiliCodes {
         if (liveInfo != null){
 
             // 获取BotId
-            long botId = bot.getLoginInfo().getData().getUserId();
+            long bot_id = bot.getLoginInfo().getData().getUserId();
+            long group_id = event.getGroupId();
 
             // 判断是否已经订阅
-            if( liveSubscribeService.existsByGroupIdAndRoomId(botId,room_id) ){
+            if( liveSubscribeRepository.existsByGroupIdAndRoomId(group_id,room_id) ){
                 bot.sendMsg(event, "订阅失败！\r\n%s 已经被订阅了呢。".formatted(room_id), false);
                 return;
             }
 
             // 构建订阅信息
             LiveSubscribe liveSubscribe = new LiveSubscribe(
-                    botId,
+                    bot_id,
                     event.getGroupId(),
                     room_id
             );
 
             // 保存订阅信息
-            liveSubscribeService.saveLiveSubscribe(liveSubscribe);
+            liveSubscribeRepository.save(liveSubscribe);
 
             // 保存直播间信息
-            liveInfoService.saveLiveInfo(liveInfo);
+            liveInfoRepository.save(liveInfo);
 
             // 构建订阅成功返回消息
             String msg = Msg.builder().text("成功订阅-\r\n")
@@ -100,17 +102,17 @@ public class BilibiliCodes {
         LiveInfo liveInfo = BilibiliUtils.getLiveInfoByRoomId(room_id);
 
         // 获取所有订阅此直播间的订阅信息
-        List<LiveSubscribe> allSubscribe = liveSubscribeService.findAllByRoomId(room_id);
+        List<LiveSubscribe> allSubscribe = liveSubscribeRepository.findAllByRoomId(room_id);
 
         // 判断是否正常获取直播间信息
         if(liveInfo == null){
-            liveInfo = liveInfoService.findLiveInfoByRoomID(room_id);
+            liveInfo = liveInfoRepository.findLiveByRoomId(room_id);
             liveInfo.setStatus(1);
             liveInfo.setStartTime(BilibiliUtils.getStartTimeByRoomId(room_id));
         }
 
         // 更新 状态码 开播时间
-        liveInfoService.saveLiveInfo(liveInfo);
+        liveInfoRepository.save(liveInfo);
 
         // 构建开播提醒消息
         String msg = Msg.builder().text(liveInfo.getUname() + " 开播了！\r\n")
@@ -136,15 +138,15 @@ public class BilibiliCodes {
         LiveInfo liveInfo = BilibiliUtils.getLiveInfoByRoomId(room_id);
 
         // 获取所有订阅此直播间的订阅信息
-        List<LiveSubscribe> allSubscribe = liveSubscribeService.findAllByRoomId(room_id);
+        List<LiveSubscribe> allSubscribe = liveSubscribeRepository.findAllByRoomId(room_id);
 
         // 判断是否正常获取直播间信息
         if(liveInfo == null){
-            liveInfo = liveInfoService.findLiveInfoByRoomID(room_id);
+            liveInfo = liveInfoRepository.findLiveByRoomId(room_id);
         }
 
 
-        long startDate = liveInfoService.findStartTimeByRoomId(room_id);
+        long startDate = liveInfoRepository.findStartTimeByRoomId(room_id);
         long nowDate = (System.currentTimeMillis() / 1000);
         long hour = ((nowDate - startDate) / 3600 );
 
@@ -157,7 +159,7 @@ public class BilibiliCodes {
         // 更新 状态码 开播时间
         liveInfo.setStatus(0);
         liveInfo.setStartTime(0L);
-        liveInfoService.saveLiveInfo(liveInfo);
+        liveInfoRepository.save(liveInfo);
 
         // 遍历所有订阅此直播的订阅信息
         for (LiveSubscribe subscribe : allSubscribe){

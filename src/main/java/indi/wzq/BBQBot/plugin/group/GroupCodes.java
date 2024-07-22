@@ -4,10 +4,12 @@ import com.alibaba.fastjson2.JSONObject;
 import com.mikuac.shiro.constant.ActionParams;
 import com.mikuac.shiro.core.Bot;
 import com.mikuac.shiro.dto.event.message.AnyMessageEvent;
+import indi.wzq.BBQBot.entity.group.GroupInfo;
+import indi.wzq.BBQBot.entity.group.GroupTask;
 import indi.wzq.BBQBot.entity.group.UserInfo;
-import indi.wzq.BBQBot.service.group.GroupInfoService;
-import indi.wzq.BBQBot.service.group.GroupTaskService;
-import indi.wzq.BBQBot.service.user.UserInfoService;
+import indi.wzq.BBQBot.repo.GroupInfoRepository;
+import indi.wzq.BBQBot.repo.GroupTaskRepository;
+import indi.wzq.BBQBot.repo.UserInfoRepository;
 import indi.wzq.BBQBot.utils.DateUtils;
 import indi.wzq.BBQBot.utils.FileUtils;
 import indi.wzq.BBQBot.utils.GraphicUtils;
@@ -28,11 +30,12 @@ import java.util.Random;
 @Slf4j
 public class GroupCodes {
 
-    private static final UserInfoService userInfoService = SpringUtils.getBean(UserInfoService.class);
+    private static final UserInfoRepository userInfoRepository = SpringUtils.getBean(UserInfoRepository.class);
 
-    private static final GroupInfoService groupInfoService = SpringUtils.getBean(GroupInfoService.class);
+    private static final GroupInfoRepository groupInfoRepository = SpringUtils.getBean(GroupInfoRepository.class);
 
-    private static final GroupTaskService groupTaskService = SpringUtils.getBean(GroupTaskService.class);
+    private static final GroupTaskRepository groupTaskRepository = SpringUtils.getBean(GroupTaskRepository.class);
+
 
 
     /**
@@ -52,7 +55,7 @@ public class GroupCodes {
         Long signUserId = event.getUserId();
 
         // 通过签到用户id获取用户信息
-        UserInfo userInfo = userInfoService.findUserInfoByUserId(signUserId);
+        UserInfo userInfo = userInfoRepository.findByUserId(signUserId);
 
         // 获取当前时间
         Date signInTime = new Date();
@@ -65,7 +68,7 @@ public class GroupCodes {
             userInfo.setSignInTime(signInTime);
             userInfo.setSignInNum(1);
             userInfo.setSignInContNum(1);
-            userInfoService.saveUserInfo(userInfo);
+            userInfoRepository.save(userInfo);
 
             sendSignMsg(bot,event,userInfo);
 
@@ -97,7 +100,7 @@ public class GroupCodes {
                 userInfo.setSignInNum(userInfo.getSignInNum() + 1);
 
                 // 更新用户信息
-                userInfoService.saveUserInfo(userInfo);
+                userInfoRepository.save(userInfo);
 
                 sendSignMsg(bot,event,userInfo);
             }
@@ -156,9 +159,24 @@ public class GroupCodes {
      * @param event Event
      */
     public static void subscribeDailyNews(Bot bot, AnyMessageEvent event) {
-        groupTaskService.updateDailyNewsByGroupId(event.getGroupId(), true);
+        long group_id = event.getGroupId();
+        long bot_id = bot.getLoginInfo().getData().getUserId();
 
-        groupInfoService.creatGroupInfo(event.getGroupId(),event.getUserId());
+        GroupTask groupTask = groupTaskRepository.findByGroupId(group_id);
+        if (groupTask == null){
+            groupTask = new GroupTask(group_id);
+        }
+
+        groupTask.setDailyNews(true);
+
+        groupTaskRepository.save(groupTask);
+
+        GroupInfo groupInfo = groupInfoRepository.findGroupInfoByGroupIdAndBotId(group_id, bot_id);
+
+        if (groupInfo == null) {
+            groupInfo =new GroupInfo(group_id,bot_id);
+        }
+        groupInfoRepository.save(groupInfo);
 
         String msg = Msg.builder()
                 .text("每日早报-订阅成功")
@@ -191,9 +209,9 @@ public class GroupCodes {
      */
     public static void Fortune(Bot bot, AnyMessageEvent event){
 
-        UserInfo userInfo = userInfoService.findUserInfoByUserId(event.getUserId());
+        UserInfo userInfo = userInfoRepository.findByUserId(event.getUserId());
         Random random = new Random();
-        String path = "/static/img/jrys/" + (random.nextInt(52) + 1) + ".png";
+        String path = "/static/img/jrys/pretty_derby_colorful" + (random.nextInt(52) + 1) + ".png";
         Date date = new Date();
 
         if (userInfo == null) {
@@ -202,7 +220,7 @@ public class GroupCodes {
             userInfo.setFortuneTime(date);
 
             // 初始化用户信息
-            userInfoService.saveUserInfo(userInfo);
+            userInfoRepository.save(userInfo);
 
             String msg = Msg.builder()
                     .at(event.getUserId())

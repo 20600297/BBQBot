@@ -1,7 +1,8 @@
 package indi.wzq.BBQBot.task;
 
+import indi.wzq.BBQBot.entity.bilibili.LiveInfo;
 import indi.wzq.BBQBot.plugin.bilibili.BilibiliCodes;
-import indi.wzq.BBQBot.service.live.LiveInfoService;
+import indi.wzq.BBQBot.repo.LiveInfoRepository;
 import indi.wzq.BBQBot.utils.BilibiliUtils;
 import indi.wzq.BBQBot.utils.SpringUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -9,16 +10,14 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @Component
 @Slf4j
 public class TaskBilibiliLiveStatus {
-
-    // 信息控制器
-    private static final LiveInfoService liveInfoService = SpringUtils.getBean(LiveInfoService.class);
-
+    private static final LiveInfoRepository liveInfoRepository = SpringUtils.getBean(LiveInfoRepository.class);
 
     /**
      * 直播间状态查询定时任务
@@ -28,10 +27,10 @@ public class TaskBilibiliLiveStatus {
     public void execute() {
 
         // 获取所有 房间id
-        List<String> roomIds = liveInfoService.findAllRoomIds();
+        List<String> roomIds = liveInfoRepository.findAllRoomId();
 
         // 获取数据库中所有 直播id-直播状态 的键值对
-        Map<String,Integer> roomIdToStatus = liveInfoService.findAllRoomIdToStatus();
+        Map<String,Integer> roomIdToStatus = findAllRoomIdToStatus();
 
         // 遍历订阅列表
         for(String roomId : roomIds){
@@ -51,13 +50,13 @@ public class TaskBilibiliLiveStatus {
                     // 开播事件
                     case  1 -> BilibiliCodes.liveStart(roomId);
                     // 轮播事件
-                    case  2 -> liveInfoService.updateLiveInfoByRoomId(roomId,2);
+                    case  2 -> updateLiveInfoByRoomId(roomId,2);
                     // 直播间异常事件
-                    case -2 -> liveInfoService.updateLiveInfoByRoomId(roomId,-2);
+                    case -2 -> updateLiveInfoByRoomId(roomId,-2);
                     // 未知情况
                     default -> {
                         System.out.println("直播间 " + roomId + " 状态异常，状态码- " + statusCode);
-                        liveInfoService.updateLiveInfoByRoomId(roomId,-2);
+                        updateLiveInfoByRoomId(roomId,-2);
                     }
                 }
             }
@@ -71,5 +70,29 @@ public class TaskBilibiliLiveStatus {
     @Scheduled(cron = "0 0 * * * ?")
     public void life(){
         log.info("-----当前程序正常存活！-----");
+    }
+
+    /**
+     * 获取所有直播id和直播状态的键值对
+     * @return 直播id-直播状态
+     */
+    private Map<String, Integer> findAllRoomIdToStatus() {
+        Map<String,Integer> result = new HashMap<>();
+        List<String> allRoomId = liveInfoRepository.findAllRoomId();
+        for (String roomId : allRoomId){
+            result.put(roomId,liveInfoRepository.findStatusByRoomId(roomId));
+        }
+        return result;
+    }
+
+    /**
+     * 通过房间id更新状态码
+     * @param room_id 房间id
+     * @param status_code 状态码
+     */
+    private void updateLiveInfoByRoomId(String room_id , Integer status_code) {
+        LiveInfo liveInfo = liveInfoRepository.findLiveByRoomId(room_id);
+        liveInfo.setStatus(status_code);
+        liveInfoRepository.save(liveInfo);
     }
 }
