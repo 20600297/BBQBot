@@ -1,5 +1,8 @@
 package indi.wzq.BBQBot.utils;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.font.FontRenderContext;
@@ -25,6 +28,8 @@ public class GraphicUtils {
      */
     public static BufferedImage graphicSignInMsg(String background_url,String user_face_url,String user_name){
         try {
+            // 可以选择设置字体的大小等属性
+            Font finalFont = customFont.deriveFont(40f); // 字体大小设置为40
 
             // 背景图像
             File backgroundImageFile = new File(background_url);
@@ -46,11 +51,15 @@ public class GraphicUtils {
             // 设置透明度（Alpha值为0.5表示半透明）
             g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
 
+            FontRenderContext frc = g2d.getFontRenderContext();
+            Rectangle2D bounds = finalFont.getStringBounds(user_name, frc);
+
             // 绘制用户信息栏
-            RoundRectangle2D roundRect = new RoundRectangle2D.Double(30, 60, 300, 100, 8, 8);
+            RoundRectangle2D roundRect = new RoundRectangle2D.Double(30, 60, 175+bounds.getWidth(), 100, 8, 8);
             g2d.setColor(Color.WHITE); // 设置颜色为白色
             g2d.fill(roundRect); // 填充圆角矩形
 
+            // 绘制底部时间栏
             roundRect = new RoundRectangle2D.Double(1090,backgroundImage.getHeight() - 30 , 180, 20, 8, 8);
             g2d.setColor(Color.WHITE); // 设置颜色为白色
             g2d.fill(roundRect); // 填充圆角矩形
@@ -58,9 +67,6 @@ public class GraphicUtils {
             g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
 
             g2d.drawImage(faceImage,50,45,null);
-
-            // 可以选择设置字体的大小等属性
-            Font finalFont = customFont.deriveFont(40f); // 字体大小设置为40
 
             // 设置文本的颜色
             g2d.setColor(Color.BLACK); // 或者你想要的任何颜色
@@ -170,9 +176,6 @@ public class GraphicUtils {
     private static void writeCopyright(BufferedImage original_image, String copyright){
         Graphics2D g2d = original_image.createGraphics();
 
-        // 设置文本的颜色
-        g2d.setColor(Color.BLACK); // 或者你想要的任何颜色
-
         Font finalFont = new Font("Arial", Font.ITALIC, 16); // 字体名，样式，大小
         g2d.setFont(finalFont);
 
@@ -184,6 +187,13 @@ public class GraphicUtils {
 
         int y = getBottomFountY(original_image, finalFont, frc, copyright);
 
+        g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
+        RoundRectangle2D roundRect = new RoundRectangle2D.Double(x-3,y - bounds.getHeight(), bounds.getWidth()+6, bounds.getHeight()+6, 8, 8);
+        g2d.setColor(Color.WHITE); // 设置颜色为白色
+        g2d.fill(roundRect); // 填充圆角矩形
+        g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
+
+        g2d.setColor(Color.BLACK); // 或者你想要的任何颜色
         g2d.drawString(copyright, x, y);
     }
 

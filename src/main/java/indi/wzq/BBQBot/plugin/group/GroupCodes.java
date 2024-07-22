@@ -127,7 +127,7 @@ public class GroupCodes {
 
         // 确保文件夹存在
         if (!file.getParentFile().exists()) {
-            if(file.getParentFile().mkdirs())log.info("签到图像保存文件夹构建异常！");
+            file.getParentFile().mkdirs();
         }
 
         try {
@@ -211,16 +211,14 @@ public class GroupCodes {
 
         UserInfo userInfo = userInfoRepository.findByUserId(event.getUserId());
         Random random = new Random();
-        String path = "/static/img/jrys/pretty_derby_colorful" + (random.nextInt(52) + 1) + ".png";
+        String path = "/static/img/jrys/pretty_derby_colorful/" + (random.nextInt(52) + 1) + ".png";
         Date date = new Date();
 
         if (userInfo == null) {
 
+            // 初始化用户信息
             userInfo = creatUserInfo(event.getUserId());
             userInfo.setFortuneTime(date);
-
-            // 初始化用户信息
-            userInfoRepository.save(userInfo);
 
             String msg = Msg.builder()
                     .at(event.getUserId())
@@ -232,6 +230,8 @@ public class GroupCodes {
 
 
         } else {
+            userInfo.setFortuneTime(date);
+
             if (DateUtils.isYesterdayOrEarlier(userInfo.getFortuneTime(),date)) {
                 String msg = Msg.builder()
                         .at(event.getUserId())
@@ -250,6 +250,8 @@ public class GroupCodes {
                 bot.sendMsg(event, msg, true);
             }
         }
+
+        userInfoRepository.save(userInfo);
     }
 
     /**
@@ -260,6 +262,7 @@ public class GroupCodes {
         HttpUtils.Body body = HttpUtils.sendGetFile("https://iw233.cn/api.php"
                 ,"sort=pc"
                 , Headers.of("referer", "https://weibo.com/").newBuilder());
+
 
         String fileName = DateUtils.format(new Date(), "yyyy-MM-dd-HH_mm_ss") + "-bg.png";
 
