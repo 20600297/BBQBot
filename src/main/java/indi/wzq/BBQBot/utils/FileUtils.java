@@ -14,7 +14,7 @@ public class FileUtils {
 
         // 确保文件夹存在
         if (!file.getParentFile().exists()) {
-            if (file.getParentFile().mkdirs()) return null;
+            file.getParentFile().mkdirs();
         }
 
         // 使用 FileOutputStream 将二进制数据写入文件
