@@ -26,7 +26,6 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Random;
 
-
 @Slf4j
 public class GroupCodes {
 
@@ -208,10 +207,33 @@ public class GroupCodes {
      * @param event Event
      */
     public static void Fortune(Bot bot, AnyMessageEvent event){
+        Random random = new Random();
+        String path = "/static/img/jrys/arknights/"+(random.nextInt(33)+1)+".jpg";
+        // 绘制签到图像
+        BufferedImage bufferedImage = GraphicUtils
+                .graphicFortune(path);
+
+        String directoryPath = "./data/img/Fortune/";
+        String fileName = DateUtils.format(new Date(), "yyyy-MM-dd") +"-" + event.getUserId() + "fortune.png";
+        String filePath = directoryPath + fileName;
+
+        // 创建 File 对象
+        File file = new File(filePath);
+
+        // 确保文件夹存在
+        if (!file.getParentFile().exists()) {
+            file.getParentFile().mkdirs();
+        }
+
+        try {
+            ImageIO.write(bufferedImage, "png", file);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
 
         UserInfo userInfo = userInfoRepository.findByUserId(event.getUserId());
-        Random random = new Random();
-        String path = "/static/img/jrys/pretty_derby_colorful/" + (random.nextInt(52) + 1) + ".png";
+
         Date date = new Date();
 
         if (userInfo == null) {
@@ -223,20 +245,19 @@ public class GroupCodes {
             String msg = Msg.builder()
                     .at(event.getUserId())
                     .text("今日运势")
-                    .imgBase64(FileUtils.readImageFile(path))
+                    .img("file:///" + file.getAbsolutePath())
                     .build();
 
             bot.sendMsg(event, msg, true);
 
 
         } else {
-            userInfo.setFortuneTime(date);
 
             if (DateUtils.isYesterdayOrEarlier(userInfo.getFortuneTime(),date)) {
                 String msg = Msg.builder()
                         .at(event.getUserId())
                         .text("今日运势")
-                        .imgBase64(FileUtils.readImageFile(path))
+                        .img("file:///" + file.getAbsolutePath())
                         .build();
 
                 bot.sendMsg(event, msg, true);
@@ -251,6 +272,7 @@ public class GroupCodes {
             }
         }
 
+        userInfo.setFortuneTime(date);
         userInfoRepository.save(userInfo);
     }
 

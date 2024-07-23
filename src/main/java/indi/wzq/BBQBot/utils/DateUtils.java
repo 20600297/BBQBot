@@ -45,12 +45,7 @@ public class DateUtils {
         LocalDate localDate1 = date1.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
         LocalDate localDate2 = date2.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 
-        // 使用ChronoUnit.DAYS.between()来计算两个LocalDate之间的天数差
-        long daysBetween = ChronoUnit.DAYS.between(localDate1, localDate2);
-
-        // 判断date1是否是date2的昨天或更早
-        // 注意：daysBetween为正数表示localDate1在localDate2之前，负数表示在之后
-        return daysBetween >= 1;
+        return localDate1.isBefore(localDate2.minusDays(1)) || localDate1.equals(localDate2.minusDays(1));
     }
 
     /**

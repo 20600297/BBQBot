@@ -1,5 +1,7 @@
 package indi.wzq.BBQBot.utils;
 
+import com.alibaba.fastjson2.JSONArray;
+import com.alibaba.fastjson2.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -10,10 +12,10 @@ import java.awt.font.LineMetrics;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.Date;
+import java.util.List;
+import java.util.Random;
 
 public class GraphicUtils {
 
@@ -90,6 +92,44 @@ public class GraphicUtils {
             throw new RuntimeException(e);
         }
 
+    }
+
+    /**
+     * 绘制今日运势
+     * @param background_url 背景图片路径
+     * @return 图像流
+     */
+    public static BufferedImage graphicFortune(String background_url){
+        try {
+            BufferedImage backgroundImage = ImageIO
+                    .read(new ByteArrayInputStream(FileUtils.readImageFile(background_url)));
+
+            // 生成绘画对象
+            Graphics2D g2d = backgroundImage.createGraphics();
+
+            Font finalFont = customFont.deriveFont(40f); // 字体大小设置为40
+            g2d.setFont(finalFont);
+            g2d.setColor(Color.WHITE); // 设置颜色为白色
+
+            List<String> fortune = getFortune();
+            String luck = fortune.get(0);
+            String content = fortune.get(1);
+
+
+            FontRenderContext frc = g2d.getFontRenderContext();
+            Rectangle2D bounds = finalFont.getStringBounds(luck, frc);
+            int x = (int) (280 - bounds.getWidth()) / 2;
+            g2d.drawString(luck, x, 115);
+
+            writeContest(g2d,content);
+
+            // 释放Graphics2D资源
+            g2d.dispose();
+
+            return backgroundImage;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -260,6 +300,92 @@ public class GraphicUtils {
         } catch (IOException | FontFormatException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * 加载运势文案
+     * @return 运势文案
+     */
+    private static List<String> getFortune(){
+        InputStream inputStream = GraphicUtils.class
+                .getClassLoader()
+                .getResourceAsStream("static/fortune/copywriting.json");
+
+        if (inputStream == null) {
+            throw new RuntimeException("资源文件未找到: static/fortune/copywriting.json");
+        }
+
+        // 使用BufferedReader来读取InputStream中的内容
+        StringBuilder jsonStringBuilder = new StringBuilder();
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                jsonStringBuilder.append(line).append('\n');
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        // 现在jsonStringBuilder中包含了完整的JSON字符串
+        String jsonString = jsonStringBuilder.toString().trim();
+
+        JSONObject jsonObject = JSONObject.parseObject(jsonString);
+
+        JSONArray copywriting = jsonObject.getJSONArray("copywriting");
+
+        Random random = new Random();
+
+        JSONObject fortune = copywriting.getJSONObject(random.nextInt(copywriting.size()));
+
+        String good_luck = fortune.getString("good-luck");
+
+        JSONArray contents = fortune.getJSONArray("content");
+
+        String content = contents.getString(random.nextInt(contents.size()));
+        return  List.of(good_luck,content);
+    }
+
+
+    private static void writeContest(Graphics2D g2d,String contest){
+        Font finalFont = getFontByClasspath("/static/font/sakura.ttf").deriveFont(18f);
+        g2d.setFont(finalFont);
+        g2d.setColor(Color.BLACK);
+
+        FontRenderContext frc = g2d.getFontRenderContext();
+
+        if (!contest.matches(".*[ ,!].*")){
+            for (int i = 0; i < contest.length(); i++) {
+                String substring = contest.substring(i, i + 1);
+
+                Rectangle2D bounds = finalFont.getStringBounds(substring, frc);
+                int x = (int)( ((280 - bounds.getWidth()) / 2) );
+                int y = (int)( 190 + i * bounds.getHeight() );
+                g2d.drawString(substring, x, y);
+            }
+        } else {
+            int i = 0;
+            for (; i < contest.length(); i++) {
+                String substring = contest.substring(i, i + 1);
+
+                Rectangle2D bounds = finalFont.getStringBounds(substring, frc);
+                int x = (int)( ((280 - bounds.getWidth()) / 2) + 20);
+                int y = (int)( 190 + i * bounds.getHeight() );
+                g2d.drawString(substring, x, y);
+                if (substring.matches(".*[ ,!].*")) break;
+            }
+
+            for (int j = 0; i < contest.length(); i++,j++) {
+                String substring = contest.substring(i, i + 1);
+
+                Rectangle2D bounds = finalFont.getStringBounds(substring, frc);
+                int x = (int)( ((280 - bounds.getWidth()) / 2) - (bounds.getWidth()+5) );
+                int y = (int)( 190 + (j) * bounds.getHeight());
+                g2d.drawString(substring, x, y);
+            }
+        }
+
+
+
     }
 
     /**
