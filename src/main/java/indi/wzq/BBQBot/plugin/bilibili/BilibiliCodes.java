@@ -148,12 +148,12 @@ public class BilibiliCodes {
 
         long startDate = liveInfoRepository.findStartTimeByRoomId(room_id);
         long nowDate = (System.currentTimeMillis() / 1000);
-        long hour = ((nowDate - startDate) / 3600 );
+        float hour = ( (nowDate - startDate) / 3600f );
 
         // 构建下播提醒消息
         String msg = Msg.builder().text(liveInfo.getUname() + " 下播了！\r\n")
                 .img(liveInfo.getCover())
-                .text("今天播了 " + hour + "个小时呢！")
+                .text("今天播了 %.2f 个小时呢！".formatted(hour))
                 .build();
 
         // 更新 状态码 开播时间
@@ -165,7 +165,7 @@ public class BilibiliCodes {
         for (LiveSubscribe subscribe : allSubscribe){
             // 发送推送信息
             botContainer.robots.get(subscribe.getBotId())
-                    .sendGroupMsg(subscribe.getGroupId(), msg, true);
+                    .sendGroupMsg(subscribe.getGroupId(), msg, false);
         }
 
     }

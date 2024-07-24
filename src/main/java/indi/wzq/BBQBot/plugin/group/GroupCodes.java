@@ -12,7 +12,7 @@ import indi.wzq.BBQBot.repo.GroupTaskRepository;
 import indi.wzq.BBQBot.repo.UserInfoRepository;
 import indi.wzq.BBQBot.utils.DateUtils;
 import indi.wzq.BBQBot.utils.FileUtils;
-import indi.wzq.BBQBot.utils.GraphicUtils;
+import indi.wzq.BBQBot.utils.Graphic.GraphicUtils;
 import indi.wzq.BBQBot.utils.SpringUtils;
 import indi.wzq.BBQBot.utils.http.HttpUtils;
 import indi.wzq.BBQBot.utils.onebot.Msg;

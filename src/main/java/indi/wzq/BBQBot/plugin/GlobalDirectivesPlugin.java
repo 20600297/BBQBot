@@ -1,9 +1,11 @@
 package indi.wzq.BBQBot.plugin;
 
 import com.mikuac.shiro.annotation.AnyMessageHandler;
+import com.mikuac.shiro.annotation.GroupAddRequestHandler;
 import com.mikuac.shiro.annotation.common.Shiro;
 import com.mikuac.shiro.core.Bot;
 import com.mikuac.shiro.dto.event.message.AnyMessageEvent;
+import com.mikuac.shiro.dto.event.request.GroupAddRequestEvent;
 import indi.wzq.BBQBot.enums.Codes;
 import indi.wzq.BBQBot.plugin.bilibili.BilibiliCodes;
 import indi.wzq.BBQBot.plugin.group.GroupCodes;
@@ -51,5 +53,10 @@ public class GlobalDirectivesPlugin {
                 case GROUP_SUBSCRIBE_DAILYNEWS -> GroupCodes.subscribeDailyNews(bot,event);
             }
         });
+    }
+
+    @GroupAddRequestHandler
+    public void example(Bot bot, GroupAddRequestEvent event){
+        bot.setGroupAddRequest(event.getFlag(),event.getSubType(),true,"");
     }
 }

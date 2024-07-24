@@ -1,9 +1,9 @@
-package indi.wzq.BBQBot.utils;
+package indi.wzq.BBQBot.utils.Graphic;
 
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
+import indi.wzq.BBQBot.utils.DateUtils;
+import indi.wzq.BBQBot.utils.FileUtils;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -13,13 +13,12 @@ import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
 public class GraphicUtils {
-
-    private static final Font customFont = getFontByClasspath("/static/font/MaoKenYuanZhuTi.ttf");
 
     /**
      * 绘制签到返回图像
@@ -30,8 +29,9 @@ public class GraphicUtils {
      */
     public static BufferedImage graphicSignInMsg(String background_url,String user_face_url,String user_name){
         try {
+
             // 可以选择设置字体的大小等属性
-            Font finalFont = customFont.deriveFont(40f); // 字体大小设置为40
+            Font finalFont = FontUtils.GetFontByClasspath(FontUtils.MaoKen).deriveFont(40f); // 字体大小设置为40
 
             // 背景图像
             File backgroundImageFile = new File(background_url);
@@ -107,7 +107,7 @@ public class GraphicUtils {
             // 生成绘画对象
             Graphics2D g2d = backgroundImage.createGraphics();
 
-            Font finalFont = customFont.deriveFont(40f); // 字体大小设置为40
+            Font finalFont = FontUtils.GetFontByClasspath(FontUtils.MaoKen).deriveFont(40f); // 字体大小设置为40
             g2d.setFont(finalFont);
             g2d.setColor(Color.WHITE); // 设置颜色为白色
 
@@ -280,29 +280,6 @@ public class GraphicUtils {
     }
 
     /**
-     * 通过字体文件类路径加载字体
-     * @param path 字体文件类路径
-     * @return 字体文件
-     */
-    private static Font getFontByClasspath(String path){
-        try {
-
-            InputStream inputStream = GraphicUtils.class.getResourceAsStream(path);
-
-            if (inputStream == null) {
-                return new Font("Arial", Font.BOLD, 16);
-            }
-
-            Font font = Font.createFont(Font.TRUETYPE_FONT, inputStream);
-            inputStream.close();
-
-            return font;
-        } catch (IOException | FontFormatException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    /**
      * 加载运势文案
      * @return 运势文案
      */
@@ -317,7 +294,7 @@ public class GraphicUtils {
 
         // 使用BufferedReader来读取InputStream中的内容
         StringBuilder jsonStringBuilder = new StringBuilder();
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"))) {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 jsonStringBuilder.append(line).append('\n');
@@ -347,7 +324,7 @@ public class GraphicUtils {
 
 
     private static void writeContest(Graphics2D g2d,String contest){
-        Font finalFont = getFontByClasspath("/static/font/sakura.ttf").deriveFont(18f);
+        Font finalFont = FontUtils.GetFontByClasspath(FontUtils.Sakura).deriveFont(18f);
         g2d.setFont(finalFont);
         g2d.setColor(Color.BLACK);
 

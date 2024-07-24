@@ -14,7 +14,7 @@ public class FileUtils {
 
         // 确保文件夹存在
         if (!file.getParentFile().exists()) {
-            file.getParentFile().mkdirs();
+            if(!file.getParentFile().mkdirs()) System.out.println("创建 "+ filePath +" 异常");
         }
 
         // 使用 FileOutputStream 将二进制数据写入文件
@@ -36,7 +36,7 @@ public class FileUtils {
             }
 
             // 使用ByteArrayOutputStream来存储图片数据
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ByteArrayOutputStream base = new ByteArrayOutputStream();
 
             byte[] buffer = new byte[4096]; // 4KB缓冲区
 
@@ -44,11 +44,11 @@ public class FileUtils {
 
             // 读取InputStream到ByteArrayOutputStream
             while ((bytesRead = resourceAsStream.read(buffer)) != -1) {
-                baos.write(buffer, 0, bytesRead);
+                base.write(buffer, 0, bytesRead);
             }
 
             // 将ByteArrayOutputStream转换为byte数组
-            byte[] bytes = baos.toByteArray();
+            byte[] bytes = base.toByteArray();
 
             // 关闭流
             resourceAsStream.close();
