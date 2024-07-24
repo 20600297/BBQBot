@@ -83,7 +83,7 @@ public class GroupCodes {
                         .build();
 
                 // 发送信息
-                bot.sendMsg(event, msg, true);
+                bot.sendMsg(event, msg, false);
 
             } else {
 
@@ -140,12 +140,12 @@ public class GroupCodes {
                     .text("签到次数 %d；连续签到 %d。".formatted(user_info.getSignInNum(),user_info.getSignInContNum()))
                     .build();
             // 发送签到成功信息
-            bot.sendMsg(event, msg, true);
+            bot.sendMsg(event, msg, false);
             msg = Msg.builder()
                     .img("file:///" + file.getAbsolutePath())
                     .build();
             // 发送签到图像
-            bot.sendMsg(event, msg, true);
+            bot.sendMsg(event, msg, false);
 
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -198,7 +198,7 @@ public class GroupCodes {
                 .img(url)
                 .build();
 
-        bot.sendMsg(event, msg, true);
+        bot.sendMsg(event, msg, false);
     }
 
     /**
@@ -248,7 +248,7 @@ public class GroupCodes {
                     .img("file:///" + file.getAbsolutePath())
                     .build();
 
-            bot.sendMsg(event, msg, true);
+            bot.sendMsg(event, msg, false);
 
 
         } else {
@@ -260,7 +260,7 @@ public class GroupCodes {
                         .img("file:///" + file.getAbsolutePath())
                         .build();
 
-                bot.sendMsg(event, msg, true);
+                bot.sendMsg(event, msg, false);
             } else {
                 String msg = Msg.builder()
                         .at(event.getUserId())
@@ -268,7 +268,7 @@ public class GroupCodes {
                         .text("贪心的人是不会有好运的。")
                         .build();
 
-                bot.sendMsg(event, msg, true);
+                bot.sendMsg(event, msg, false);
             }
         }
 

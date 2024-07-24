@@ -82,7 +82,7 @@ public class BilibiliCodes {
                     .build();
 
             // 发送订阅成功信息
-            bot.sendMsg(event, msg, true);
+            bot.sendMsg(event, msg, false);
 
         } else {
 
@@ -124,7 +124,7 @@ public class BilibiliCodes {
         for (LiveSubscribe subscribe : allSubscribe){
             // 发送推送信息
             botContainer.robots.get(subscribe.getBotId())
-                    .sendGroupMsg(subscribe.getGroupId(), msg, true);
+                    .sendGroupMsg(subscribe.getGroupId(), msg, false);
         }
     }
 
