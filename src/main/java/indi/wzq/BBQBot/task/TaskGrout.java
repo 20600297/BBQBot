@@ -35,7 +35,7 @@ public class TaskGrout {
 
         for(long groupId : groupIds){
             botContainer.robots.get(SpringUtils.getBean(GroupInfoRepository.class).findBotIdByGroupId(groupId))
-                    .sendGroupMsg(groupId,msg,true);
+                    .sendGroupMsg(groupId,msg,false);
         }
     }
 }
