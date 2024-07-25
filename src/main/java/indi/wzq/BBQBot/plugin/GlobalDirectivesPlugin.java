@@ -2,12 +2,15 @@ package indi.wzq.BBQBot.plugin;
 
 import com.mikuac.shiro.annotation.AnyMessageHandler;
 import com.mikuac.shiro.annotation.GroupAddRequestHandler;
+import com.mikuac.shiro.annotation.GroupDecreaseHandler;
 import com.mikuac.shiro.annotation.common.Shiro;
 import com.mikuac.shiro.core.Bot;
 import com.mikuac.shiro.dto.event.message.AnyMessageEvent;
+import com.mikuac.shiro.dto.event.notice.GroupDecreaseNoticeEvent;
 import com.mikuac.shiro.dto.event.request.GroupAddRequestEvent;
 import indi.wzq.BBQBot.enums.Codes;
 import indi.wzq.BBQBot.plugin.bilibili.BilibiliCodes;
+import indi.wzq.BBQBot.plugin.group.GroupEvent;
 import indi.wzq.BBQBot.plugin.group.GroupCodes;
 import indi.wzq.BBQBot.utils.CodeUtils;
 import indi.wzq.BBQBot.utils.onebot.CqMatcher;
@@ -56,7 +59,16 @@ public class GlobalDirectivesPlugin {
     }
 
     @GroupAddRequestHandler
-    public void example(Bot bot, GroupAddRequestEvent event){
+    public void Add(Bot bot, GroupAddRequestEvent event){
+        event.getComment();
         bot.setGroupAddRequest(event.getFlag(),event.getSubType(),true,"");
+        GroupEvent.ConsentAdd(bot,event);
     }
+
+    @GroupDecreaseHandler
+    public void Decrease(Bot bot, GroupDecreaseNoticeEvent event){
+        GroupEvent.Decrease(bot,event);
+    }
+
+
 }

@@ -135,7 +135,7 @@ public class GroupCodes {
             // 构建签到成功返回消息
             String msg = Msg.builder().reply(event.getMessageId())
                     .at(user_info.getUserId())
-                    .text("成功签到-")
+                    .text(" 成功签到-")
                     .text(DateUtils.format(user_info.getSignInTime(),"yyyy/MM/dd") + "\t\n")
                     .text("签到次数 %d；连续签到 %d。".formatted(user_info.getSignInNum(),user_info.getSignInContNum()))
                     .build();
@@ -244,7 +244,7 @@ public class GroupCodes {
 
             String msg = Msg.builder()
                     .at(event.getUserId())
-                    .text("今日运势")
+                    .text(" 今日运势")
                     .img("file:///" + file.getAbsolutePath())
                     .build();
 
@@ -256,7 +256,7 @@ public class GroupCodes {
             if (DateUtils.isYesterdayOrEarlier(userInfo.getFortuneTime(),date)) {
                 String msg = Msg.builder()
                         .at(event.getUserId())
-                        .text("今日运势")
+                        .text(" 今日运势")
                         .img("file:///" + file.getAbsolutePath())
                         .build();
 
@@ -264,7 +264,7 @@ public class GroupCodes {
             } else {
                 String msg = Msg.builder()
                         .at(event.getUserId())
-                        .text("每人一天限抽签1次呢！\r\n")
+                        .text(" 每人一天限抽签1次呢！\r\n")
                         .text("贪心的人是不会有好运的。")
                         .build();
 
