@@ -2,6 +2,7 @@ package indi.wzq.BBQBot.utils;
 
 import com.alibaba.fastjson2.JSONObject;
 import indi.wzq.BBQBot.entity.bilibili.LiveInfo;
+import indi.wzq.BBQBot.entity.bilibili.UpInfo;
 import indi.wzq.BBQBot.utils.http.HttpUtils;
 
 public class BilibiliUtils {
@@ -35,47 +36,9 @@ public class BilibiliUtils {
         }
     }
 
-    /**
-     * 通过房间id获取直播间状态码
-     * @param room_id 房间id
-     * @return 直播间状态码
-     */
-    public static Integer getLiveStatusByRoomId(String room_id){
-
-        HttpUtils.Body body = HttpUtils.sendGet("https://api.live.bilibili.com/xlive/web-room/v1/index/getInfoByRoom", "room_id=" + room_id);
-        JSONObject jsonObject = JSONObject.parseObject(body.getBody());
-        if (jsonObject.getInteger("code") == 0) {
-
-            return jsonObject.getJSONObject("data")
-                    .getJSONObject("room_info").getInteger("live_status");
-        } else {
-
-            System.out.println(room_id + "：直播间状态异常");
-            return -2;
-
-        }
-    }
-
-
-    /**
-     * 通过房间id获取开播时间
-     * @param room_id 房间id
-     * @return 开播时间戳
-     */
-    public static Long getStartTimeByRoomId(String room_id){
-
-        HttpUtils.Body body = HttpUtils.sendGet("https://api.live.bilibili.com/xlive/web-room/v1/index/getInfoByRoom", "room_id=" + room_id);
-        JSONObject jsonObject = JSONObject.parseObject(body.getBody());
-        if (jsonObject.getInteger("code") == 0) {
-
-            return jsonObject.getJSONObject("data")
-                    .getJSONObject("room_info").getLong("live_start_time");
-        } else {
-
-            System.out.println(room_id + "：直播间状态异常");
-            return 0L;
-
-        }
+    //TODO:获取up主动态
+    public static UpInfo getUpInfoByUpUid(String up_uid){
+        return null;
     }
 
 }

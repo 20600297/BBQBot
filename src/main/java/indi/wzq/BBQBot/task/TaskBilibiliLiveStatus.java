@@ -36,7 +36,13 @@ public class TaskBilibiliLiveStatus {
         for(String roomId : roomIds){
 
             // 通过房间id获取直播间状态
-            Integer statusCode =  BilibiliUtils.getLiveStatusByRoomId(roomId);
+            LiveInfo liveInfo =  BilibiliUtils.getLiveInfoByRoomId(roomId);
+
+            if (liveInfo == null) {
+                continue;
+            }
+
+            Integer statusCode = liveInfo.getStatus();
 
             // 判断状态码是否改变
             if (!statusCode.equals(roomIdToStatus.get(roomId))){
@@ -46,9 +52,9 @@ public class TaskBilibiliLiveStatus {
                 //TODO 完善直播间状态变化提示
                 switch (statusCode) {
                     // 下播事件
-                    case  0 -> BilibiliCodes.liveStop(roomId);
+                    case  0 -> BilibiliCodes.liveStop(roomId,liveInfo);
                     // 开播事件
-                    case  1 -> BilibiliCodes.liveStart(roomId);
+                    case  1 -> BilibiliCodes.liveStart(roomId,liveInfo);
                     // 轮播事件
                     case  2 -> updateLiveInfoByRoomId(roomId,2);
                     // 直播间异常事件

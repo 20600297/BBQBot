@@ -96,28 +96,18 @@ public class BilibiliCodes {
      * 开播事件
      * @param room_id 直播id
      */
-    public static void liveStart(String room_id){
-
-        // 获取直播间信息
-        LiveInfo liveInfo = BilibiliUtils.getLiveInfoByRoomId(room_id);
+    public static void liveStart(String room_id,LiveInfo live_info){
 
         // 获取所有订阅此直播间的订阅信息
         List<LiveSubscribe> allSubscribe = liveSubscribeRepository.findAllByRoomId(room_id);
 
-        // 判断是否正常获取直播间信息
-        if(liveInfo == null){
-            liveInfo = liveInfoRepository.findLiveByRoomId(room_id);
-            liveInfo.setStatus(1);
-            liveInfo.setStartTime(BilibiliUtils.getStartTimeByRoomId(room_id));
-        }
-
         // 更新 状态码 开播时间
-        liveInfoRepository.save(liveInfo);
+        liveInfoRepository.save(live_info);
 
         // 构建开播提醒消息
-        String msg = Msg.builder().text(liveInfo.getUname() + " 开播了！\r\n")
-                .img(liveInfo.getCover())
-                .text(liveInfo.getTitle())
+        String msg = Msg.builder().text(live_info.getUname() + " 开播了！\r\n")
+                .img(live_info.getCover())
+                .text(live_info.getTitle())
                 .build();
 
         // 遍历所有订阅此直播的订阅信息
@@ -132,34 +122,22 @@ public class BilibiliCodes {
      * 下播事件
      * @param room_id 直播id
      */
-    public static void liveStop(String room_id){
-
-        // 获取直播间信息
-        LiveInfo liveInfo = BilibiliUtils.getLiveInfoByRoomId(room_id);
+    public static void liveStop(String room_id,LiveInfo live_info){
 
         // 获取所有订阅此直播间的订阅信息
         List<LiveSubscribe> allSubscribe = liveSubscribeRepository.findAllByRoomId(room_id);
-
-        // 判断是否正常获取直播间信息
-        if(liveInfo == null){
-            liveInfo = liveInfoRepository.findLiveByRoomId(room_id);
-        }
-
 
         long startDate = liveInfoRepository.findStartTimeByRoomId(room_id);
         long nowDate = (System.currentTimeMillis() / 1000);
         float hour = ( (nowDate - startDate) / 3600f );
 
         // 构建下播提醒消息
-        String msg = Msg.builder().text(liveInfo.getUname() + " 下播了！\r\n")
-                .img(liveInfo.getCover())
+        String msg = Msg.builder().text(live_info.getUname() + " 下播了！\r\n")
+                .img(live_info.getCover())
                 .text("今天播了 %.2f 个小时呢！".formatted(hour))
                 .build();
 
-        // 更新 状态码 开播时间
-        liveInfo.setStatus(0);
-        liveInfo.setStartTime(0L);
-        liveInfoRepository.save(liveInfo);
+        liveInfoRepository.save(live_info);
 
         // 遍历所有订阅此直播的订阅信息
         for (LiveSubscribe subscribe : allSubscribe){

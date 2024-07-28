@@ -61,6 +61,8 @@ public class GlobalDirectivesPlugin {
         });
     }
 
+
+    //TODO:入群申请校验及处理
     @GroupAddRequestHandler
     public void Add(Bot bot, GroupAddRequestEvent event){
         event.getComment();
