@@ -9,11 +9,11 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.font.FontRenderContext;
 import java.awt.font.LineMetrics;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
@@ -79,7 +79,7 @@ public class GraphicUtils {
 
             g2d.drawString(DateUtils.getGreeting(), 175, 145);
 
-            writeCopyright(backgroundImage, "Creat By BBQBot v1.0.4");
+            writeCopyright(backgroundImage, "Creat By BBQBot v1.0.5");
 
             writeDate(backgroundImage,DateUtils.format(new Date(),"yyyy-MM-dd hh:mm:ss"));
 
@@ -102,7 +102,7 @@ public class GraphicUtils {
     public static BufferedImage graphicFortune(String background_url){
         try {
             BufferedImage backgroundImage = ImageIO
-                    .read(new ByteArrayInputStream(FileUtils.readImageFile(background_url)));
+                    .read(new ByteArrayInputStream(FileUtils.readImgByClasspath(background_url)));
 
             // 生成绘画对象
             Graphics2D g2d = backgroundImage.createGraphics();
@@ -284,27 +284,7 @@ public class GraphicUtils {
      * @return 运势文案
      */
     private static List<String> getFortune(){
-        InputStream inputStream = GraphicUtils.class
-                .getClassLoader()
-                .getResourceAsStream("static/fortune/copywriting.json");
-
-        if (inputStream == null) {
-            throw new RuntimeException("资源文件未找到: static/fortune/copywriting.json");
-        }
-
-        // 使用BufferedReader来读取InputStream中的内容
-        StringBuilder jsonStringBuilder = new StringBuilder();
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                jsonStringBuilder.append(line).append('\n');
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        // 现在jsonStringBuilder中包含了完整的JSON字符串
-        String jsonString = jsonStringBuilder.toString().trim();
+        String jsonString = FileUtils.readJsonByClasspath("static/json/jrys/copywriting.json");
 
         JSONObject jsonObject = JSONObject.parseObject(jsonString);
 
@@ -386,4 +366,51 @@ public class GraphicUtils {
         }
     }
 
+
+    /**
+     * 将图片旋转180度
+     * @param imgBytes 图片字节组
+     * @return 图片字节组
+     */
+    public static byte[] ImageRotate180(byte[] imgBytes){
+        try {
+            BufferedImage image = ImageIO
+                    .read(new ByteArrayInputStream(imgBytes));
+
+            // 创建一个新的BufferedImage用于存储旋转后的图片
+            BufferedImage rotatedImage = new BufferedImage(image.getWidth(), image.getHeight(), image.getType());
+
+            // 获取Graphics2D对象以绘制旋转后的图片
+            Graphics2D g2d = rotatedImage.createGraphics();
+
+            //新建变换（变换的实际效果和代码顺序是反的，下面实际效果是先旋转后平移）
+            AffineTransform trans = new AffineTransform();
+            //2.由于原点在左上角，所以顺时针旋转180度后图片在可视范围左上侧，需向右下移动过来
+            trans.translate(image.getWidth(), image.getHeight());
+            //1.原始图片顺时针旋转180度
+            trans.rotate(Math.PI);
+
+            //获取新建内存图片的“图形对象”，通过它在内存图片中绘图
+            Graphics2D graphics2D = (Graphics2D)rotatedImage.getGraphics();
+            //绘图前，先设置变换对象，应用上面的旋转、平移
+            graphics2D.setTransform(trans);
+
+            //将老图片，从新图片的原点（0,0）点开始绘制到新图片中
+            graphics2D.drawImage(image, 0, 0, null);
+
+            // 释放Graphics2D资源
+            g2d.dispose();
+
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+            // 将旋转后的图片写入ByteArrayOutputStream
+            ImageIO.write(rotatedImage, "jpg", baos);
+
+            // 获取字节数组
+            return baos.toByteArray();
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

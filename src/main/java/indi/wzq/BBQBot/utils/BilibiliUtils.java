@@ -2,7 +2,6 @@ package indi.wzq.BBQBot.utils;
 
 import com.alibaba.fastjson2.JSONObject;
 import indi.wzq.BBQBot.entity.bilibili.LiveInfo;
-import indi.wzq.BBQBot.entity.bilibili.UpInfo;
 import indi.wzq.BBQBot.utils.http.HttpUtils;
 
 public class BilibiliUtils {
@@ -37,8 +36,5 @@ public class BilibiliUtils {
     }
 
     //TODO:获取up主动态
-    public static UpInfo getUpInfoByUpUid(String up_uid){
-        return null;
-    }
 
 }

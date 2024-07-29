@@ -3,6 +3,7 @@ package indi.wzq.BBQBot.utils;
 import indi.wzq.BBQBot.plugin.group.GroupCodes;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 
 public class FileUtils {
 
@@ -27,12 +28,19 @@ public class FileUtils {
         }
     }
 
-    public static byte[] readImageFile(String class_path){
+    /**
+     * 通过类路径加载包内的img文件
+     * @param class_path 类路径
+     * @return img字节组
+     */
+    public static byte[] readImgByClasspath(String class_path){
         try {
-            InputStream resourceAsStream = GroupCodes.class.getResourceAsStream(class_path);
+            InputStream resourceAsStream = FileUtils.class
+                    .getClassLoader()
+                    .getResourceAsStream(class_path);
 
             if (resourceAsStream == null) {
-                throw new IOException("文件未找到: " + class_path);
+                throw new IOException("资源文件未找到：" + class_path);
             }
 
             // 使用ByteArrayOutputStream来存储图片数据
@@ -54,6 +62,39 @@ public class FileUtils {
             resourceAsStream.close();
 
             return bytes;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * 通过类路径加载包内的json文件
+     * @param class_path 类路径
+     * @return json字符串
+     */
+    public static String readJsonByClasspath(String class_path){
+        try {
+            InputStream inputStream = FileUtils.class
+                    .getClassLoader()
+                    .getResourceAsStream(class_path);
+
+            if (inputStream == null) {
+                throw new IOException("资源文件未找到：" + class_path);
+            }
+
+            // 使用BufferedReader来读取InputStream中的内容
+            StringBuilder jsonStringBuilder = new StringBuilder();
+
+            BufferedReader reader = new BufferedReader(
+                    new InputStreamReader(inputStream, StandardCharsets.UTF_8)
+            );
+
+            String line;
+            while ((line = reader.readLine()) != null) {
+                jsonStringBuilder.append(line).append('\n');
+            }
+
+            return jsonStringBuilder.toString().trim();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

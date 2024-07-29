@@ -57,6 +57,7 @@ public class GlobalDirectivesPlugin {
                 case GROUP_SUBSCRIBE_DAILYNEWS -> GroupCodes.subscribeDailyNews(bot,event);
                 case CHAT_AIR_CONDITIONER_OPEN -> GroupChat.AirConditionerOpen(bot,event);
                 case CHAT_AIR_CONDITIONER_CLOSE -> GroupChat.AirConditionerClose(bot,event);
+                case TAROT_GET_TAROT -> GroupCodes.getTarot(bot,event);
             }
         });
     }

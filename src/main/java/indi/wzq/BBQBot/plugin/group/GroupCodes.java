@@ -1,12 +1,14 @@
 package indi.wzq.BBQBot.plugin.group;
 
 import com.alibaba.fastjson2.JSONObject;
+import com.mikuac.shiro.common.utils.ShiroUtils;
 import com.mikuac.shiro.constant.ActionParams;
 import com.mikuac.shiro.core.Bot;
 import com.mikuac.shiro.dto.event.message.AnyMessageEvent;
 import indi.wzq.BBQBot.entity.group.GroupInfo;
 import indi.wzq.BBQBot.entity.group.GroupTask;
 import indi.wzq.BBQBot.entity.group.UserInfo;
+import indi.wzq.BBQBot.enums.Codes;
 import indi.wzq.BBQBot.repo.GroupInfoRepository;
 import indi.wzq.BBQBot.repo.GroupTaskRepository;
 import indi.wzq.BBQBot.repo.UserInfoRepository;
@@ -23,8 +25,7 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.Date;
-import java.util.Random;
+import java.util.*;
 
 @Slf4j
 public class GroupCodes {
@@ -315,5 +316,38 @@ public class GroupCodes {
 
     private static UserInfo creatUserInfo(long user_id){
         return new UserInfo(user_id,new Date(0),new Date(0),0,0,1);
+    }
+
+
+    /**
+     * 抽取塔罗牌事件
+     * @param bot Bot
+     * @param event Event
+     */
+    public static void getTarot(Bot bot, AnyMessageEvent event){
+
+        bot.sendMsg(event,"少女祷告中...",false);
+
+        String[][] tarots = TarotMaster.getTarots(1);
+
+        List<String> msgList = new ArrayList<>();
+
+        if (tarots[0][1].equals("0")){
+            msgList.add("【顺位】 的 【" + tarots[0][0] + "】");
+        } else {
+            msgList.add("【逆位】 的 【" + tarots[0][0] + "】");
+
+        }
+        msgList.add(tarots[0][2]);
+
+        // 构建合并转发消息（selfId为合并转发消息显示的账号，nickname为显示的发送者昵称，msgList为消息列表）
+        List<Map<String, Object>> forwardMsg = ShiroUtils
+                .generateForwardMsg(
+                        bot.getSelfId(),
+                        bot.getLoginInfo().getData().getNickname(),
+                        msgList);
+
+        // 发送合并转发内容到群（groupId为要发送的群）
+        bot.sendGroupForwardMsg(event.getGroupId(), forwardMsg);
     }
 }
