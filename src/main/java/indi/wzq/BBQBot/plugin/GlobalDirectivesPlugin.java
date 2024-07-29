@@ -51,13 +51,18 @@ public class GlobalDirectivesPlugin {
         Optional.ofNullable(code).ifPresent(codes -> {
             switch (codes) {
                 case LIVE_SUBSCRIBE -> BilibiliCodes.subscribe(bot,event);
+
                 case GROUP_SIGNIN -> GroupCodes.signIn(bot,event);
                 case GROUP_DAILYNEWS -> GroupCodes.DailyNews(bot,event);
                 case GROUP_FORTUNE -> GroupCodes.Fortune(bot,event);
                 case GROUP_SUBSCRIBE_DAILYNEWS -> GroupCodes.subscribeDailyNews(bot,event);
+
                 case CHAT_AIR_CONDITIONER_OPEN -> GroupChat.AirConditionerOpen(bot,event);
                 case CHAT_AIR_CONDITIONER_CLOSE -> GroupChat.AirConditionerClose(bot,event);
+
                 case TAROT_GET_TAROT -> GroupCodes.getTarot(bot,event);
+                case TAROT_GET_TAROTS -> GroupCodes.getTarots(bot,event);
+                case TAROT_GET_FORMATIONS -> GroupCodes.getFormations(bot,event);
             }
         });
     }

@@ -8,12 +8,14 @@ import com.mikuac.shiro.dto.event.message.AnyMessageEvent;
 import indi.wzq.BBQBot.entity.group.GroupInfo;
 import indi.wzq.BBQBot.entity.group.GroupTask;
 import indi.wzq.BBQBot.entity.group.UserInfo;
+import indi.wzq.BBQBot.enums.Codes;
 import indi.wzq.BBQBot.repo.GroupInfoRepository;
 import indi.wzq.BBQBot.repo.GroupTaskRepository;
 import indi.wzq.BBQBot.repo.UserInfoRepository;
 import indi.wzq.BBQBot.utils.DateUtils;
 import indi.wzq.BBQBot.utils.FileUtils;
 import indi.wzq.BBQBot.utils.Graphic.GraphicUtils;
+import indi.wzq.BBQBot.utils.MatcherUtils;
 import indi.wzq.BBQBot.utils.SpringUtils;
 import indi.wzq.BBQBot.utils.http.HttpUtils;
 import indi.wzq.BBQBot.utils.onebot.Msg;
@@ -25,6 +27,8 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Slf4j
 public class GroupCodes {
@@ -327,17 +331,19 @@ public class GroupCodes {
 
         bot.sendMsg(event,"少女祷告中...",false);
 
+        // 获取牌数据
         String[][] tarots = TarotMaster.getTarots(1);
 
+        // 构建返回信息
         List<String> msgList = new ArrayList<>();
-
         if (tarots[0][1].equals("0")){
             msgList.add("【顺位】 的 【" + tarots[0][0] + "】");
         } else {
             msgList.add("【逆位】 的 【" + tarots[0][0] + "】");
-
         }
         msgList.add(tarots[0][2]);
+        msgList.add("解牌：");
+        msgList.add(tarots[0][3]);
 
         // 构建合并转发消息（selfId为合并转发消息显示的账号，nickname为显示的发送者昵称，msgList为消息列表）
         List<Map<String, Object>> forwardMsg = ShiroUtils
@@ -349,4 +355,82 @@ public class GroupCodes {
         // 发送合并转发内容到群（groupId为要发送的群）
         bot.sendGroupForwardMsg(event.getGroupId(), forwardMsg);
     }
+
+    /**
+     * 抽取多张塔罗牌事件
+     * @param bot Bot
+     * @param event Event
+     */
+    public static void getTarots(Bot bot, AnyMessageEvent event){
+        bot.sendMsg(event,"少女祷告中...",false);
+
+
+        Pattern p = Pattern.compile(Codes.TAROT_GET_TAROTS.getStr());
+        Matcher m = p.matcher(event.getRawMessage().trim());
+        if ( !m.matches()) {
+            log.warn("参数截取异常！");
+            return;
+        }
+
+        int num = Integer.parseInt(m.group(1));
+
+        if (num > 10) {
+            String msg = Msg.builder()
+                    .reply(event.getMessageId())
+                    .text("数量太多了，不给抽！")
+                    .build();
+            bot.sendMsg(event, msg, false);
+            return;
+        }
+
+        // 获取牌数据
+        String[][] tarots = TarotMaster.getTarots(num);
+
+        // 构建返回信息
+        List<String> msgList = new ArrayList<>();
+        for (int i=0 ; i<num ; i++){
+            msgList.add("第 "+ (i+1) +" 张：");
+            if (tarots[i][1].equals("0")){
+                msgList.add("【顺位】 的 【" + tarots[i][0] + "】");
+            } else {
+                msgList.add("【逆位】 的 【" + tarots[i][0] + "】");
+            }
+            msgList.add(tarots[i][2]);
+            msgList.add("解牌：");
+            msgList.add(tarots[i][3]);
+        }
+
+        // 构建合并转发消息（selfId为合并转发消息显示的账号，nickname为显示的发送者昵称，msgList为消息列表）
+        List<Map<String, Object>> forwardMsg = ShiroUtils
+                .generateForwardMsg(
+                        bot.getSelfId(),
+                        bot.getLoginInfo().getData().getNickname(),
+                        msgList);
+
+        // 发送合并转发内容到群（groupId为要发送的群）
+        bot.sendGroupForwardMsg(event.getGroupId(), forwardMsg);
+    }
+
+    /**
+     * 塔罗牌阵事件
+     * @param bot Bot
+     * @param event Event
+     */
+    public static void getFormations(Bot bot, AnyMessageEvent event){
+        bot.sendMsg(event,"少女祷告中...",false);
+        String name = event.getMessage().replaceAll("^塔罗牌阵", "").trim() + "牌阵";
+
+        List<String> msgList = TarotMaster.getFormations(event.getSender().getNickname(), name);
+
+        List<Map<String, Object>> forwardMsg = ShiroUtils
+                .generateForwardMsg(
+                        bot.getSelfId(),
+                        bot.getLoginInfo().getData().getNickname(),
+                        msgList);
+
+        // 发送合并转发内容到群（groupId为要发送的群）
+        bot.sendGroupForwardMsg(event.getGroupId(), forwardMsg);
+    }
+
+    //TODO:错误情况返回信息
 }

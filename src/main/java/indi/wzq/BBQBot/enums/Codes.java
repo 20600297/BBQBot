@@ -20,7 +20,8 @@ public enum Codes {
     CHAT_AIR_CONDITIONER_CLOSE("^空调关"),
 
     TAROT_GET_TAROT("^抽塔罗牌"),
-    TAROT_GET_TAROTS("^抽[1-9]\\d*张塔罗牌"),
+    TAROT_GET_TAROTS("^抽([1-9]\\d*)张塔罗牌"),
+    TAROT_GET_FORMATIONS("^塔罗牌阵(圣三角|时间之流|四要素|五牌阵|吉普赛十字|马蹄|六芒星)"),
     ;
 
     private String str;
