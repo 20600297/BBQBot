@@ -8,7 +8,6 @@ import com.mikuac.shiro.dto.event.message.AnyMessageEvent;
 import indi.wzq.BBQBot.entity.group.GroupInfo;
 import indi.wzq.BBQBot.entity.group.GroupTask;
 import indi.wzq.BBQBot.entity.group.UserInfo;
-import indi.wzq.BBQBot.enums.Codes;
 import indi.wzq.BBQBot.repo.GroupInfoRepository;
 import indi.wzq.BBQBot.repo.GroupTaskRepository;
 import indi.wzq.BBQBot.repo.UserInfoRepository;

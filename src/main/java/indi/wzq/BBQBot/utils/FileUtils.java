@@ -1,7 +1,5 @@
 package indi.wzq.BBQBot.utils;
 
-import indi.wzq.BBQBot.plugin.group.GroupCodes;
-
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 
