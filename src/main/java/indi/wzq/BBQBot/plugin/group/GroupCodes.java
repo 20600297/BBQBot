@@ -331,18 +331,10 @@ public class GroupCodes {
         bot.sendMsg(event,"少女祷告中...",false);
 
         // 获取牌数据
-        String[][] tarots = TarotMaster.getTarots(1);
+        String[] tarot = TarotMaster.getTarots(1)[0];
 
         // 构建返回信息
-        List<String> msgList = new ArrayList<>();
-        if (tarots[0][1].equals("0")){
-            msgList.add("【顺位】 的 【" + tarots[0][0] + "】");
-        } else {
-            msgList.add("【逆位】 的 【" + tarots[0][0] + "】");
-        }
-        msgList.add(tarots[0][2]);
-        msgList.add("解牌：");
-        msgList.add(tarots[0][3]);
+        List<String> msgList = TarotMaster.creatMsg(tarot);
 
         // 构建合并转发消息（selfId为合并转发消息显示的账号，nickname为显示的发送者昵称，msgList为消息列表）
         List<Map<String, Object>> forwardMsg = ShiroUtils
@@ -386,18 +378,7 @@ public class GroupCodes {
         String[][] tarots = TarotMaster.getTarots(num);
 
         // 构建返回信息
-        List<String> msgList = new ArrayList<>();
-        for (int i=0 ; i<num ; i++){
-            msgList.add("第 "+ (i+1) +" 张：");
-            if (tarots[i][1].equals("0")){
-                msgList.add("【顺位】 的 【" + tarots[i][0] + "】");
-            } else {
-                msgList.add("【逆位】 的 【" + tarots[i][0] + "】");
-            }
-            msgList.add(tarots[i][2]);
-            msgList.add("解牌：");
-            msgList.add(tarots[i][3]);
-        }
+        List<String> msgList = TarotMaster.creatMsg(tarots, num);
 
         // 构建合并转发消息（selfId为合并转发消息显示的账号，nickname为显示的发送者昵称，msgList为消息列表）
         List<Map<String, Object>> forwardMsg = ShiroUtils
@@ -431,5 +412,5 @@ public class GroupCodes {
         bot.sendGroupForwardMsg(event.getGroupId(), forwardMsg);
     }
 
-    //TODO:错误情况返回信息
+    //TODO :错误情况返回信息
 }

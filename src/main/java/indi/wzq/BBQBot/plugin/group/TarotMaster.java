@@ -80,7 +80,12 @@ public class TarotMaster {
         return data;
     }
 
-
+    /**
+     * 生成塔罗牌阵回复
+     * @param user_name 用户名
+     * @param formation_name 牌阵名
+     * @return 返回消息列表
+     */
     public static List<String> getFormations(String user_name , String formation_name){
         // 获取牌数据
         JSONObject tarotJson = JSONObject.parseObject(
@@ -111,6 +116,41 @@ public class TarotMaster {
             msgList.add(tarots[i][2]);
             msgList.add("解牌：");
             msgList.add(tarots[i][3]);
+        }
+
+        return msgList;
+    }
+
+    /**
+     * 构建单张塔罗牌回复
+     * @param data 回复数据
+     * @return 回复列表
+     */
+    public static List<String> creatMsg(String[] data){
+        List<String> msgList = new ArrayList<>();
+        if (data[1].equals("0")){
+            msgList.add("【顺位】 的 【" + data[0] + "】");
+        } else {
+            msgList.add("【逆位】 的 【" + data[0] + "】");
+        }
+        msgList.add(data[2]);
+        msgList.add("解牌：");
+        msgList.add(data[3]);
+        return msgList;
+    }
+
+    /**
+     * 构建多张塔罗牌回复
+     * @param data 回复数据
+     * @param num 塔罗牌张数
+     * @return 回复列表
+     */
+    public static List<String> creatMsg(String[][] data,Integer num){
+        List<String> msgList = new ArrayList<>();
+
+        for (int i=0 ; i<num ; i++){
+            msgList.add("第 "+ (i+1) +" 张：");
+            msgList.addAll(creatMsg(data[i]));
         }
 
         return msgList;
