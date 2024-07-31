@@ -37,6 +37,11 @@ build/
 mvnw
 mvnw.cmd
 
+### 忽略其余文件
+/DataSource
+/models
+locate.yaml
+
 ### 忽略测试文件
 test
 ### 忽略Log文件
@@ -44,7 +49,4 @@ logs
 *.log
 ### 忽略db文件
 /data
-### 忽略其余文件
-/DataSource
-/models
-locate.yaml
+/collection

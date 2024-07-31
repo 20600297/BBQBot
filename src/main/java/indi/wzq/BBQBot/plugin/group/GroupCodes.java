@@ -19,12 +19,7 @@ import indi.wzq.BBQBot.utils.SpringUtils;
 import indi.wzq.BBQBot.utils.http.HttpUtils;
 import indi.wzq.BBQBot.utils.onebot.Msg;
 import lombok.extern.slf4j.Slf4j;
-import okhttp3.Headers;
-
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -37,8 +32,6 @@ public class GroupCodes {
     private static final GroupInfoRepository groupInfoRepository = SpringUtils.getBean(GroupInfoRepository.class);
 
     private static final GroupTaskRepository groupTaskRepository = SpringUtils.getBean(GroupTaskRepository.class);
-
-
 
     /**
      * 用户签到事件
@@ -59,100 +52,67 @@ public class GroupCodes {
         // 通过签到用户id获取用户信息
         UserInfo userInfo = userInfoRepository.findByUserId(signUserId);
 
+        // 如果未获得到用户信息则初始化用户信息
+        if (userInfo == null)
+            userInfo = new UserInfo(event.getUserId());
+
         // 获取当前时间
         Date signInTime = new Date();
 
-        // 判断是否为初次签到
-        if (userInfo == null) {
+        // 返回信息
+        bot.sendMsg( event,
+                DailyMaster.getSignInMsg(userInfo,signInTime, event.getMessageId()) ,
+                false );
 
-            userInfo = creatUserInfo(signUserId);
-            // 初始化用户信息
-            userInfo.setSignInTime(signInTime);
-            userInfo.setSignInNum(1);
-            userInfo.setSignInContNum(1);
-            userInfoRepository.save(userInfo);
+        // 返回图
+        bot.sendMsg( event,
+                DailyMaster.getSignInImgMsg(userInfo.getUserId(),event.getSender().getNickname()) ,
+                false );
 
-            sendSignMsg(bot,event,userInfo);
 
-        } else {
-
-            // 判断今日是否签到
-            if (DateUtils.isSameDay(signInTime,userInfo.getSignInTime())){
-
-                // 构建消息
-                String msg = Msg.builder().reply(event.getMessageId())
-                        .at(signUserId)
-                        .text("您今天已经签过到了呢！")
-                        .build();
-
-                // 发送信息
-                bot.sendMsg(event, msg, false);
-
-            } else {
-
-                // 判断是否为连续签到
-                if (DateUtils.isYesterdayOrEarlier(userInfo.getSignInTime(),signInTime)){
-                    userInfo.setSignInContNum(userInfo.getSignInContNum() + 1);
-                } else {
-                    userInfo.setSignInContNum(1);
-                }
-
-                userInfo.setSignInTime(signInTime);
-
-                userInfo.setSignInNum(userInfo.getSignInNum() + 1);
-
-                // 更新用户信息
-                userInfoRepository.save(userInfo);
-
-                sendSignMsg(bot,event,userInfo);
-            }
-        }
     }
 
     /**
-     * 发送签到成功消息
+     * 今日运势事件
      * @param bot Bot
      * @param event Event
-     * @param user_info 用户信息
      */
-    private static void sendSignMsg(Bot bot, AnyMessageEvent event,UserInfo user_info) {
+    public static void Fortune(Bot bot, AnyMessageEvent event){
+        Random random = new Random();
+        String path = "/static/img/jrys/arknights/"+(random.nextInt(33)+1)+".jpg";
         // 绘制签到图像
         BufferedImage bufferedImage = GraphicUtils
-                .graphicSignInMsg(getBackground(), getQqFace(user_info.getUserId()), event.getSender().getNickname());
+                .graphicFortune(path);
 
-        String directoryPath = "./data/img/signInMsg/";
-        String fileName = DateUtils.format(new Date(), "yyyy-MM-dd") +"-" + user_info.getUserId() + "-sign.png";
-        String filePath = directoryPath + fileName;
+        Date date = new Date();
 
-        // 创建 File 对象
-        File file = new File(filePath);
+        UserInfo userInfo = userInfoRepository.findByUserId(event.getUserId());
 
-        // 确保文件夹存在
-        if (!file.getParentFile().exists()) {
-            file.getParentFile().mkdirs();
+        // 如果未获得到用户信息则初始化用户信息
+        if (userInfo == null)
+            userInfo = new UserInfo(event.getUserId());
+
+
+        if (DateUtils.isYesterdayOrEarlier(userInfo.getFortuneTime(),date)) {
+            String msg = Msg.builder()
+                    .at(event.getUserId())
+                    .text(" 今日运势")
+                    .imgBase64(FileUtils.bufferedImage2Bytes(bufferedImage))
+                    .build();
+
+            bot.sendMsg(event, msg, false);
+        } else {
+            String msg = Msg.builder()
+                    .at(event.getUserId())
+                    .text(" 每人一天限抽签1次呢！\r\n")
+                    .text("贪心的人是不会有好运的。")
+                    .build();
+
+            bot.sendMsg(event, msg, false);
         }
 
-        try {
-            ImageIO.write(bufferedImage, "png", file);
-
-            // 构建签到成功返回消息
-            String msg = Msg.builder().reply(event.getMessageId())
-                    .at(user_info.getUserId())
-                    .text(" 成功签到-")
-                    .text(DateUtils.format(user_info.getSignInTime(),"yyyy/MM/dd") + "\t\n")
-                    .text("签到次数 %d；连续签到 %d。".formatted(user_info.getSignInNum(),user_info.getSignInContNum()))
-                    .build();
-            // 发送签到成功信息
-            bot.sendMsg(event, msg, false);
-            msg = Msg.builder()
-                    .img("file:///" + file.getAbsolutePath())
-                    .build();
-            // 发送签到图像
-            bot.sendMsg(event, msg, false);
-
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        userInfo.setFortuneTime(date);
+        userInfoRepository.save(userInfo);
     }
 
     /**
@@ -165,9 +125,9 @@ public class GroupCodes {
         long bot_id = bot.getLoginInfo().getData().getUserId();
 
         GroupTask groupTask = groupTaskRepository.findByGroupId(group_id);
-        if (groupTask == null){
+
+        if (groupTask == null)
             groupTask = new GroupTask(group_id);
-        }
 
         groupTask.setDailyNews(true);
 
@@ -193,7 +153,7 @@ public class GroupCodes {
      * @param event Event
      */
     public static void DailyNews(Bot bot, AnyMessageEvent event) {
-        HttpUtils.Body body = HttpUtils.sendGet("http://dwz.2xb.cn/zaob", "");
+        HttpUtils.Body body = HttpUtils.sendGet("http://dwz.2xb.cn/zaob");
 
         String url = JSONObject.parseObject(body.getBody()).getString("imageUrl");
 
@@ -203,123 +163,6 @@ public class GroupCodes {
 
         bot.sendMsg(event, msg, false);
     }
-
-    /**
-     * 今日运势事件
-     * @param bot Bot
-     * @param event Event
-     */
-    public static void Fortune(Bot bot, AnyMessageEvent event){
-        Random random = new Random();
-        String path = "/static/img/jrys/arknights/"+(random.nextInt(33)+1)+".jpg";
-        // 绘制签到图像
-        BufferedImage bufferedImage = GraphicUtils
-                .graphicFortune(path);
-
-        String directoryPath = "./data/img/Fortune/";
-        String fileName = DateUtils.format(new Date(), "yyyy-MM-dd") +"-" + event.getUserId() + "fortune.png";
-        String filePath = directoryPath + fileName;
-
-        // 创建 File 对象
-        File file = new File(filePath);
-
-        // 确保文件夹存在
-        if (!file.getParentFile().exists()) {
-            file.getParentFile().mkdirs();
-        }
-
-        try {
-            ImageIO.write(bufferedImage, "png", file);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-
-        UserInfo userInfo = userInfoRepository.findByUserId(event.getUserId());
-
-        Date date = new Date();
-
-        if (userInfo == null) {
-
-            // 初始化用户信息
-            userInfo = creatUserInfo(event.getUserId());
-            userInfo.setFortuneTime(date);
-
-            String msg = Msg.builder()
-                    .at(event.getUserId())
-                    .text(" 今日运势")
-                    .img("file:///" + file.getAbsolutePath())
-                    .build();
-
-            bot.sendMsg(event, msg, false);
-
-
-        } else {
-
-            if (DateUtils.isYesterdayOrEarlier(userInfo.getFortuneTime(),date)) {
-                String msg = Msg.builder()
-                        .at(event.getUserId())
-                        .text(" 今日运势")
-                        .img("file:///" + file.getAbsolutePath())
-                        .build();
-
-                bot.sendMsg(event, msg, false);
-            } else {
-                String msg = Msg.builder()
-                        .at(event.getUserId())
-                        .text(" 每人一天限抽签1次呢！\r\n")
-                        .text("贪心的人是不会有好运的。")
-                        .build();
-
-                bot.sendMsg(event, msg, false);
-            }
-        }
-
-        userInfo.setFortuneTime(date);
-        userInfoRepository.save(userInfo);
-    }
-
-    /**
-     * 获取签到的背景图片
-     * @return 背景图片本地保存地址
-     */
-    private static String getBackground(){
-        HttpUtils.Body body = HttpUtils.sendGetFile("https://iw233.cn/api.php"
-                ,"sort=pc"
-                , Headers.of("referer", "https://weibo.com/").newBuilder());
-
-
-        String fileName = DateUtils.format(new Date(), "yyyy-MM-dd-HH_mm_ss") + "-bg.png";
-
-        String filePath = FileUtils.saveImageFile(body.getFile(), "./data/img/Background/", fileName);
-
-        // 判断大小是否合适
-        if ( !GraphicUtils.isSuitable(filePath) ){
-            return getBackground();
-        }
-
-        return filePath;
-    }
-
-    /**
-     * 获取QQ头像
-     * @param user_id 用户id
-     * @return 用户头像
-     */
-    private static String getQqFace(long user_id){
-        HttpUtils.Body body = HttpUtils.sendGetFile("https://qlogo2.store.qq.com/qzone/"+user_id+"/"+user_id+"/100"
-                ,""
-                , Headers.of("*", "*").newBuilder());
-
-        String fileName = DateUtils.format(new Date(), "yyyy-MM-dd-HH_mm_ss") +"-"+ user_id + "-face.png";
-
-        return FileUtils.saveImageFile(body.getFile(), "./data/img/QqFace/", fileName);
-    }
-
-    private static UserInfo creatUserInfo(long user_id){
-        return new UserInfo(user_id,new Date(0),new Date(0),0,0,1);
-    }
-
 
     /**
      * 抽取塔罗牌事件

@@ -1,5 +1,7 @@
 package indi.wzq.BBQBot.utils;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 
@@ -93,6 +95,19 @@ public class FileUtils {
             }
 
             return jsonStringBuilder.toString().trim();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static byte[] bufferedImage2Bytes(BufferedImage image){
+        try {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ImageIO.write(image, "png", baos);
+            byte[] imageBytes = baos.toByteArray();
+            baos.close();
+
+            return  imageBytes;
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

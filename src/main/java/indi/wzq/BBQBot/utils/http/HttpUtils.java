@@ -36,38 +36,82 @@ public class HttpUtils {
             .connectionPool(new ConnectionPool(10, 20, TimeUnit.MINUTES))
             .build();
 
-
-    public static Body sendGet(String url, String param) {
-        return sendGet(url, param, Headers.of("*", "*").newBuilder());
+    public static Body sendGet(String url) {
+        return sendGet(url ,
+                "" ,
+                Headers.of("*", "*").newBuilder()
+        );
     }
-
+    public static Body sendGet(String url, String param) {
+        return sendGet(
+                url ,
+                param ,
+                Headers.of("*", "*").newBuilder()
+        );
+    }
+    /**
+     * 发送 GET 请求
+     * @param url 地址
+     * @param param 参数
+     * @param headers 请求头
+     * @return 返回体
+     */
     public static Body sendGet(String url, String param, Headers.Builder headers){
         try (
-
                 Response response = client.newCall(send(url, param, headers)).execute()
         ) {
+
             //返回体
             return getBody(response);
+
         } catch (IOException e) {
             log.error(e.getMessage());
             return new Body(HttpCodeEnum.ERROR);
         }
     }
 
+
+    public static Body sendGetFile(String url){
+        return sendGetFile(
+                url ,
+                "" ,
+                Headers.of("*", "*").newBuilder()
+        );
+    }
+    public static Body sendGetFile(String url, String param){
+        return sendGetFile(
+                url ,
+                param ,
+                Headers.of("*", "*").newBuilder()
+        );
+    }
+    /**
+     * 发送获取文件的 GET 请求
+     * @param url 地址
+     * @param param 参数
+     * @param headers 请求头
+     * @return 返回体
+     */
     public static Body sendGetFile(String url, String param, Headers.Builder headers){
         try (
-
                 Response response = client.newCall(send(url, param, headers)).execute()
         ) {
             //返回体
             return getFileBody(response);
+
         } catch (IOException e) {
             log.error(e.getMessage());
             return new Body(HttpCodeEnum.ERROR);
         }
     }
 
-    //构造请求
+    /**
+     * 构造请求体
+     * @param url 地址
+     * @param param 参数
+     * @param headers 请求头
+     * @return 请求体
+     */
     private static Request send(String url, String param, Headers.Builder headers) {
         String urlNameString;
         if (!param.isEmpty()) {
@@ -92,6 +136,7 @@ public class HttpUtils {
 
     }
 
+
     @NotNull
     private static Body getBody(Response response) {
         Body body = new Body();
@@ -112,7 +157,6 @@ public class HttpUtils {
         response.close();
         return body;
     }
-
     @NotNull
     private static Body getFileBody(Response response) {
         Body body = new Body();

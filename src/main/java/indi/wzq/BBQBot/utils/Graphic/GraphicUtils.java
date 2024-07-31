@@ -20,77 +20,55 @@ import java.util.Random;
 
 public class GraphicUtils {
 
+    private static final String VERSION = "v1.0.5";
+
     /**
      * 绘制签到返回图像
-     * @param background_url 背景图片
-     * @param user_face_url 头像图片
+     * @param backgroundImage 背景图片
+     * @param faceImage 头像图片
      * @param user_name 用户昵称
      * @return 图像流
      */
-    public static BufferedImage graphicSignInMsg(String background_url,String user_face_url,String user_name){
-        try {
+    public static BufferedImage graphicSignInMsg(BufferedImage backgroundImage ,BufferedImage faceImage ,String user_name){
 
-            // 可以选择设置字体的大小等属性
-            Font finalFont = FontUtils.GetFontByClasspath(FontUtils.MaoKen).deriveFont(40f); // 字体大小设置为40
+        // 可以选择设置字体的大小等属性
+        Font finalFont = FontUtils
+                .GetFontByClasspath(FontUtils.MaoKen)
+                .deriveFont(40f); // 字体大小设置为40
 
-            // 背景图像
-            File backgroundImageFile = new File(background_url);
-            BufferedImage backgroundImage = ImageIO.read(backgroundImageFile);
+        // 生成绘画对象
+        Graphics2D g2d = backgroundImage.createGraphics();
 
-            // 用户头像
-            File faceImageFile = new File(user_face_url);
-            BufferedImage faceImage = ImageIO.read(faceImageFile);
+        // 设置透明度（Alpha值为0.5表示半透明）
+        g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
 
-            // 将头像处理为圆形
-            faceImage = clipFaceCircle(faceImage);
 
-            // 将背景图像缩小至宽度为 1280
-            backgroundImage = resizeImage(backgroundImage,1280);
+        // 获取文字数据
+        FontRenderContext frc = g2d.getFontRenderContext();
+        Rectangle2D bounds = finalFont.getStringBounds(user_name, frc);
 
-            // 生成绘画对象
-            Graphics2D g2d = backgroundImage.createGraphics();
+        // 绘制用户信息栏背板
+        drawRoundRect(g2d,0.5f,30,60,175+bounds.getWidth(), 100, 8, 8);
+        // 绘制时间信息背板
+        drawRoundRect(g2d,0.5f,1090,backgroundImage.getHeight() - 30 , 180, 20, 8, 8);
 
-            // 设置透明度（Alpha值为0.5表示半透明）
-            g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
+        // 将QQ头像绘制于用户信息栏
+        g2d.drawImage(faceImage,50,45,null);
 
-            FontRenderContext frc = g2d.getFontRenderContext();
-            Rectangle2D bounds = finalFont.getStringBounds(user_name, frc);
+        // 设置文本的颜色
+        g2d.setColor(Color.BLACK); // 或者你想要的任何颜色
+        g2d.setFont(finalFont);
 
-            // 绘制用户信息栏
-            RoundRectangle2D roundRect = new RoundRectangle2D.Double(30, 60, 175+bounds.getWidth(), 100, 8, 8);
-            g2d.setColor(Color.WHITE); // 设置颜色为白色
-            g2d.fill(roundRect); // 填充圆角矩形
+        // 绘制文本
+        g2d.drawString(user_name, 175, 105);
+        g2d.drawString(DateUtils.getGreeting(), 175, 145);
+        writeCopyright(backgroundImage, "Creat By BBQBot " + VERSION);
+        writeDate(backgroundImage,DateUtils.format(new Date(),"yyyy-MM-dd hh:mm:ss"));
 
-            // 绘制底部时间栏
-            roundRect = new RoundRectangle2D.Double(1090,backgroundImage.getHeight() - 30 , 180, 20, 8, 8);
-            g2d.setColor(Color.WHITE); // 设置颜色为白色
-            g2d.fill(roundRect); // 填充圆角矩形
+        // 释放Graphics2D资源
+        g2d.dispose();
 
-            g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
-
-            g2d.drawImage(faceImage,50,45,null);
-
-            // 设置文本的颜色
-            g2d.setColor(Color.BLACK); // 或者你想要的任何颜色
-            g2d.setFont(finalFont);
-
-            // 绘制文本
-            g2d.drawString(user_name, 175, 105);
-
-            g2d.drawString(DateUtils.getGreeting(), 175, 145);
-
-            writeCopyright(backgroundImage, "Creat By BBQBot v1.0.5");
-
-            writeDate(backgroundImage,DateUtils.format(new Date(),"yyyy-MM-dd hh:mm:ss"));
-
-            // 释放Graphics2D资源
-            g2d.dispose();
-
-            return backgroundImage;
-
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        return backgroundImage;
 
     }
 
@@ -133,81 +111,6 @@ public class GraphicUtils {
     }
 
     /**
-     * 将QQ头像处理为圆形
-     * @param original_image 原始图像
-     * @return 处理后的图像实例
-     */
-    private static BufferedImage clipFaceCircle(BufferedImage original_image ){
-
-        int width = original_image .getWidth();
-        int height = original_image .getHeight();
-        if (width != 100 || height != 100) {
-            throw new IllegalArgumentException("Image must be 1080x1080");
-        }
-
-        // 创建一个新的BufferedImage来存储圆形图片
-        BufferedImage circleImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-
-        // 绘制圆形到新的BufferedImage中，但这里我们不直接使用Graphics2D绘制，而是遍历像素
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
-                // 检查当前像素是否在圆形内
-                // 使用勾股定理计算点到圆心的距离，如果小于等于半径，则认为在圆内
-                if (isInsideCircle(x, y, width / 2, height / 2, width / 2)) {
-                    // 在圆内，保留像素
-                    circleImage.setRGB(x, y, original_image.getRGB(x, y));
-                } else {
-                    // 不在圆内，设置为透明（或任何你想要的背景色）
-                    circleImage.setRGB(x, y, 0); // 0 是完全透明的ARGB值
-                }
-            }
-        }
-        return circleImage;
-    }
-
-    /**
-     * 检查点(x, y)是否在以(centerX, centerY)为中心，radius为半径的圆内
-     * @param x x
-     * @param y y
-     * @param centerX 圆心x
-     * @param centerY 圆心y
-     * @param radius 半径
-     * @return 布尔值
-     */
-    private static boolean isInsideCircle(int x, int y, int centerX, int centerY, int radius) {
-        return (x - centerX) * (x - centerX) + (y - centerY) * (y - centerY) <= radius * radius;
-    }
-
-
-    /**
-     * 将图像缩小
-     * @param original_image 原始图像
-     * @param target_width 目标宽度
-     * @return 缩小后的图像
-     */
-    private static BufferedImage resizeImage(BufferedImage original_image, int target_width){
-        int originalWidth = original_image.getWidth();
-        int originalHeight = original_image.getHeight();
-
-        double scaleFactor = (double) target_width / originalWidth;
-
-        int target_height = (int) (originalHeight * scaleFactor);
-
-        BufferedImage resizedImage = new BufferedImage(target_width, target_height, original_image.getType());
-        Graphics2D g2d = resizedImage.createGraphics();
-
-        // 设置高质量的插值方法
-        g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
-
-        // 绘制缩放后的图像
-        g2d.drawImage(original_image, 0, 0, target_width, target_height, null);
-        g2d.dispose();
-
-        return resizedImage;
-    }
-
-
-    /**
      * 绘制版权
      *
      * @param original_image 原始图像
@@ -235,6 +138,8 @@ public class GraphicUtils {
 
         g2d.setColor(Color.BLACK); // 或者你想要的任何颜色
         g2d.drawString(copyright, x, y);
+        // 释放Graphics2D资源
+        g2d.dispose();
     }
 
     /**
@@ -260,6 +165,8 @@ public class GraphicUtils {
         int y = getBottomFountY(original_image, finalFont, frc, date);
 
         g2d.drawString(date, x, y);
+        // 释放Graphics2D资源
+        g2d.dispose();
     }
 
     /**
@@ -302,6 +209,26 @@ public class GraphicUtils {
         return  List.of(good_luck,content);
     }
 
+    /**
+     * 绘制背板
+     * @param g2d 绘画对象
+     * @param alpha 透明度
+     * @param x x
+     * @param y y
+     * @param w w
+     * @param h h
+     * @param aw aw
+     * @param ah ah
+     */
+    private static void drawRoundRect(Graphics2D g2d , float alpha , double x , double y , double w , double h , double aw , double ah ){
+        g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
+
+        RoundRectangle2D roundRect = new RoundRectangle2D.Double(x,y , w, h, aw, ah);
+        g2d.setColor(Color.WHITE); // 设置颜色为白色
+        g2d.fill(roundRect); // 填充圆角矩形
+
+        g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1));
+    }
 
     private static void writeContest(Graphics2D g2d,String contest){
         Font finalFont = FontUtils.GetFontByClasspath(FontUtils.Sakura).deriveFont(18f);
@@ -347,25 +274,94 @@ public class GraphicUtils {
 
     /**
      * 判断背景图片是否合适
-     * @param image_path 本地路径
+     * @param bytes 图片字节组
      * @return 布尔值
      */
-    public static boolean isSuitable(String image_path) {
+    public static boolean isSuitable(byte[] bytes) {
         try {
-            // 使用ImageIO读取图片文件
-            File file = new File(image_path);
-            BufferedImage image = ImageIO.read(file);
+            // 初始化图像
+            BufferedImage image = ImageIO.read(
+                    new ByteArrayInputStream(bytes)
+            );
 
-            // 获取图片的宽度
-            int width = image.getWidth();
-
-            return 1280 < width & width < 4000;
+            // 获取图片的比例
+            double ratio = (double) image.getHeight() /image.getWidth();
+            return ratio > 0.5 & ratio < 0.6;
 
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
+    /**
+     * 检查点(x, y)是否在以(centerX, centerY)为中心，radius为半径的圆内
+     * @param x x
+     * @param y y
+     * @param centerX 圆心x
+     * @param centerY 圆心y
+     * @param radius 半径
+     * @return 布尔值
+     */
+    private static boolean isInsideCircle(int x, int y, int centerX, int centerY, int radius) {
+        return (x - centerX) * (x - centerX) + (y - centerY) * (y - centerY) <= radius * radius;
+    }
+
+    /**
+     * 将图像处理为圆形
+     * @param original_image 原始图像
+     * @return 处理后的图像实例
+     */
+    public static BufferedImage clipCircle(BufferedImage original_image ){
+
+        int width = original_image .getWidth();
+        int height = original_image .getHeight();
+
+        // 创建一个新的BufferedImage来存储圆形图片
+        BufferedImage circleImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+
+        // 绘制圆形到新的BufferedImage中，但这里我们不直接使用Graphics2D绘制，而是遍历像素
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                // 检查当前像素是否在圆形内
+                // 使用勾股定理计算点到圆心的距离，如果小于等于半径，则认为在圆内
+                if (isInsideCircle(x, y, width / 2, height / 2, width / 2)) {
+                    // 在圆内，保留像素
+                    circleImage.setRGB(x, y, original_image.getRGB(x, y));
+                } else {
+                    // 不在圆内，设置为透明（或任何你想要的背景色）
+                    circleImage.setRGB(x, y, 0); // 0 是完全透明的ARGB值
+                }
+            }
+        }
+        return circleImage;
+    }
+
+    /**
+     * 将图像缩小
+     * @param original_image 原始图像
+     * @param target_width 目标宽度
+     * @return 缩小后的图像
+     */
+    public static BufferedImage resizeImage(BufferedImage original_image, int target_width){
+        int originalWidth = original_image.getWidth();
+        int originalHeight = original_image.getHeight();
+
+        double scaleFactor = (double) target_width / originalWidth;
+
+        int target_height = (int) (originalHeight * scaleFactor);
+
+        BufferedImage resizedImage = new BufferedImage(target_width, target_height, original_image.getType());
+        Graphics2D g2d = resizedImage.createGraphics();
+
+        // 设置高质量的插值方法
+        g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+
+        // 绘制缩放后的图像
+        g2d.drawImage(original_image, 0, 0, target_width, target_height, null);
+        g2d.dispose();
+
+        return resizedImage;
+    }
 
     /**
      * 将图片旋转180度
