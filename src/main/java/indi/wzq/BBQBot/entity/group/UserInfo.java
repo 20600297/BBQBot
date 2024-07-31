@@ -28,13 +28,11 @@ public class UserInfo {
     Integer level;
 
     public UserInfo(long user_id){
-        new UserInfo(
-                user_id ,
-                new Date(0) ,
-                new Date(0) ,
-                0 ,
-                0 ,
-                1
-        );
+        this.userId = user_id;
+        this.fortuneTime = new Date(0);
+        this.signInTime = new Date(0);
+        this.signInNum = 0;
+        this.signInContNum = 0;
+        this.level = 1;
     }
 }

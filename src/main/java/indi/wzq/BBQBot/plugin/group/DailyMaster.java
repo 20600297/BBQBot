@@ -44,10 +44,10 @@ public class DailyMaster {
         }
 
         user_info.setSignInTime(sign_time);
+        user_info.setSignInNum(user_info.getSignInNum() + 1 );
 
         // 更新用户信息
         SpringUtils.getBean(UserInfoRepository.class).save(user_info);
-
 
         return Msg.builder().reply(message_id)
                 .at(user_info.getUserId())

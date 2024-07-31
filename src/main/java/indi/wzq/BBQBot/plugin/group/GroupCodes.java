@@ -79,7 +79,7 @@ public class GroupCodes {
      */
     public static void Fortune(Bot bot, AnyMessageEvent event){
         Random random = new Random();
-        String path = "/static/img/jrys/arknights/"+(random.nextInt(33)+1)+".jpg";
+        String path = "/static/img/jrys/"+(random.nextInt(33)+1)+".jpg";
         // 绘制签到图像
         BufferedImage bufferedImage = GraphicUtils
                 .graphicFortune(path);
@@ -91,7 +91,6 @@ public class GroupCodes {
         // 如果未获得到用户信息则初始化用户信息
         if (userInfo == null)
             userInfo = new UserInfo(event.getUserId());
-
 
         if (DateUtils.isYesterdayOrEarlier(userInfo.getFortuneTime(),date)) {
             String msg = Msg.builder()
