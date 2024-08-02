@@ -58,18 +58,11 @@ public class GroupCodes {
 
         // 获取当前时间
         Date signInTime = new Date();
+        String[] msgs = DailyMaster.getSignInMsg(userInfo, event.getSender().getNickname(), signInTime, event.getMessageId());
 
         // 返回信息
-        bot.sendMsg( event,
-                DailyMaster.getSignInMsg(userInfo,signInTime, event.getMessageId()) ,
-                false );
-
-        // 返回图
-        bot.sendMsg( event,
-                DailyMaster.getSignInImgMsg(userInfo.getUserId(),event.getSender().getNickname()) ,
-                false );
-
-
+        for (String msg : msgs)
+            bot.sendMsg( event,msg,false );
     }
 
     /**

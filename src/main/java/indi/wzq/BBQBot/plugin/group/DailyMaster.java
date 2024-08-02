@@ -25,15 +25,17 @@ public class DailyMaster {
      * @param message_id 消息id
      * @return 签到返回信息
      */
-    public static String getSignInMsg(UserInfo user_info , Date sign_time , Integer message_id){
+    public static String[] getSignInMsg(UserInfo user_info , String user_name , Date sign_time , Integer message_id){
 
         // 判断今日是否签到
         if ( DateUtils.isSameDay(sign_time,user_info.getSignInTime()) ){
-            // 构建消息
-            return  Msg.builder().reply(message_id)
+            String[] msgs = new String[1];
+            msgs[0] = Msg.builder().reply(message_id)
                     .at(user_info.getUserId())
                     .text("您今天已经签过到了呢！")
                     .build();
+            // 构建消息
+            return msgs;
         }
 
         // 判断是否为连续签到
@@ -49,12 +51,15 @@ public class DailyMaster {
         // 更新用户信息
         SpringUtils.getBean(UserInfoRepository.class).save(user_info);
 
-        return Msg.builder().reply(message_id)
+        String[] msgs = new String[2];
+        msgs[0] = Msg.builder().reply(message_id)
                 .at(user_info.getUserId())
                 .text(" 成功签到-")
                 .text(DateUtils.format(user_info.getSignInTime(),"yyyy/MM/dd") + "\t\n")
                 .text("签到次数 %d；连续签到 %d。".formatted(user_info.getSignInNum(),user_info.getSignInContNum()))
                 .build();
+        msgs[1] = getSignInImgMsg(user_info.getUserId(),user_name);
+        return msgs;
     }
 
     /**
