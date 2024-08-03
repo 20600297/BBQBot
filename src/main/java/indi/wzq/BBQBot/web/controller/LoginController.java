@@ -1,4 +1,4 @@
-package indi.wzq.BBQBot.controller;
+package indi.wzq.BBQBot.web.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
