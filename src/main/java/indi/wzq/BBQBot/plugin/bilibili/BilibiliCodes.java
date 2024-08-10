@@ -3,6 +3,8 @@ package indi.wzq.BBQBot.plugin.bilibili;
 import com.mikuac.shiro.constant.ActionParams;
 import com.mikuac.shiro.core.Bot;
 import com.mikuac.shiro.core.BotContainer;
+import com.mikuac.shiro.dto.action.common.ActionData;
+import com.mikuac.shiro.dto.action.response.GroupAtAllRemainResp;
 import com.mikuac.shiro.dto.event.message.AnyMessageEvent;
 import indi.wzq.BBQBot.entity.bilibili.LiveInfo;
 import indi.wzq.BBQBot.entity.bilibili.LiveSubscribe;
@@ -104,17 +106,34 @@ public class BilibiliCodes {
         // 更新 状态码 开播时间
         liveInfoRepository.save(live_info);
 
-        // 构建开播提醒消息
-        String msg = Msg.builder().text(live_info.getUname() + " 开播了！\r\n")
-                .img(live_info.getCover())
-                .text(live_info.getTitle())
-                .build();
-
         // 遍历所有订阅此直播的订阅信息
         for (LiveSubscribe subscribe : allSubscribe){
+            Long groupId = subscribe.getGroupId();
+
             // 发送推送信息
-            botContainer.robots.get(subscribe.getBotId())
-                    .sendGroupMsg(subscribe.getGroupId(), msg, false);
+            Bot bot = botContainer.robots.get(subscribe.getBotId());
+
+            // 生成消息构建器
+            Msg builder = Msg.builder();
+
+            // 获取 AT全体剩余次数
+            GroupAtAllRemainResp data = bot.getGroupAtAllRemain(groupId).getData();
+
+            // 判断是否能够AT全体
+            if (data.getCanAtAll()){
+                // 判断是否有剩余次数
+                if(data.getRemainAtAllCountForUin() > 0){
+                    builder.atAll();
+                }
+            }
+
+            // 构建 返回消息
+            String msg = builder.text(live_info.getUname() + " 开播了！\r\n")
+                    .img(live_info.getCover())
+                    .text(live_info.getTitle())
+                    .build();
+
+            bot.sendGroupMsg(groupId, msg, false);
         }
     }
 
