@@ -47,18 +47,6 @@
             <artifactId>spring-boot-starter-undertow</artifactId>
         </dependency>
 
-        <!--SpringBoot Thymeleaf模板-->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-thymeleaf</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-starter-logging</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
         <!--SpringBoot JPA操作DAO-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
