@@ -50,7 +50,8 @@ public class GlobalDirectivesPlugin {
         // 判断触发指令
         Optional.ofNullable(code).ifPresent(codes -> {
             switch (codes) {
-                case LIVE_SUBSCRIBE -> BilibiliCodes.subscribe(bot,event);
+                case LIVE_SUBSCRIBE -> BilibiliCodes.LiveSubscribe(bot,event);
+                case UP_SUBSCRIBE -> BilibiliCodes.UpSubscribe(bot,event);
 
                 case GROUP_SIGNIN -> GroupCodes.signIn(bot,event);
                 case GROUP_DAILYNEWS -> GroupCodes.DailyNews(bot,event);
@@ -63,6 +64,8 @@ public class GlobalDirectivesPlugin {
 
                 case CHAT_AIR_CONDITIONER_OPEN -> GroupChat.AirConditionerOpen(bot,event);
                 case CHAT_AIR_CONDITIONER_CLOSE -> GroupChat.AirConditionerClose(bot,event);
+
+                case BILIBILI_ACCOUNT_LOGIN -> AccountCodes.BilibiliLogin(bot,event);
             }
         });
     }
