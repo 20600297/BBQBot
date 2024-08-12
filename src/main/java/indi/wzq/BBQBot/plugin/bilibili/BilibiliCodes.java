@@ -109,7 +109,8 @@ public class BilibiliCodes {
         if (upSubscribeRepository.existsByGroupIdAndMid(event.getGroupId(), mid)) {
             String msg = Msg.builder()
                     .text("订阅失败！\r\n")
-                    .text("[" + mid + "]" + "已经订阅了呢\r\n")
+                    .text("[" + mid + "]\r\n")
+                    .text("已经订阅了呢")
                     .build();
             bot.sendMsg(event, msg, false);
             return;
@@ -120,7 +121,8 @@ public class BilibiliCodes {
         if (upInfo == null) {
             String msg = Msg.builder()
                     .text("订阅失败！\r\n")
-                    .text("[" + mid + "]" + "信息获取失败\r\n")
+                    .text("[" + mid + "]\r\n")
+                    .text("信息获取失败")
                     .build();
             bot.sendMsg(event, msg, false);
             return;
