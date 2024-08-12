@@ -134,7 +134,7 @@ public class BilibiliCodes {
         upSubscribeRepository.save(upSubscribe);
 
         String msg = Msg.builder()
-                .text("成功订阅-\n")
+                .text("成功订阅-\r\n")
                 .img(upInfo.getFace())
                 .text("[" + upInfo.getUname() + "]")
                 .build();
@@ -142,6 +142,13 @@ public class BilibiliCodes {
 
         Dynamic newDynamic = BilibiliUtils.getUpNewDynamic(mid);
         upInfo.setDynamic(newDynamic);
+
+        msg = Msg.builder()
+                .text("当前最新动态-\r\n")
+                .text("类型："+newDynamic.getType()+"\r\n")
+                .text(newDynamic.getJumpUrl())
+                .build();
+        bot.sendMsg(event, msg, false);
 
         // 储存UP信息
         SpringUtils.getBean(UpInfoRepository.class).save(upInfo);
@@ -165,7 +172,7 @@ public class BilibiliCodes {
         // 构建 返回消息
         String msg = Msg.builder()
                 .atAll()
-                .text(live_info.getUname() + " 开播了！\r\n")
+                .text("\r\n" + live_info.getUname() + " 开播了！\r\n")
                 .img(live_info.getCover())
                 .text(live_info.getTitle())
                 .build();
@@ -230,7 +237,7 @@ public class BilibiliCodes {
                 // 发布视频
                 msg = Msg.builder()
                         .atAll()
-                        .text("订阅的UP [" + upInfo.getUname() + "]\r\n")
+                        .text("\r\n订阅的UP [" + upInfo.getUname() + "]\r\n")
                         .text("发布新视频啦！快去围观！\r\n")
                         .text(newDynamic.getJumpUrl())
                         .build();
@@ -239,7 +246,7 @@ public class BilibiliCodes {
                 // 图文动态
                 msg = Msg.builder()
                         .atAll()
-                        .text("订阅的UP [" + upInfo.getUname() + "]\r\n")
+                        .text("\r\n订阅的UP [" + upInfo.getUname() + "]\r\n")
                         .text("发布新的图文动态啦！快去围观！\r\n")
                         .text(newDynamic.getJumpUrl())
                         .build();
@@ -247,7 +254,7 @@ public class BilibiliCodes {
             default -> {
                 msg = Msg.builder()
                         .atAll()
-                        .text("订阅的UP [" + upInfo.getUname() + "]\r\n")
+                        .text("\r\n订阅的UP [" + upInfo.getUname() + "]\r\n")
                         .text("发布新的动态啦！快去围观！\r\n")
                         .text(newDynamic.getJumpUrl())
                         .build();

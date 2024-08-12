@@ -115,7 +115,7 @@ public class BilibiliUtils {
                         .getJSONObject("archive");
 
                 String cover = archive.getString("cover");
-                String jumpUrl = archive.getString("jump_url");
+                String jumpUrl = archive.getString("jump_url").substring(2);
                 String title = archive.getString("title");
                 AVDynamic avDynamic = new AVDynamic(id, date, type, jumpUrl, cover, title);
 
