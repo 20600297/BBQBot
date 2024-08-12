@@ -24,7 +24,7 @@ public class TaskBilibiliLiveInfo {
      */
     @Async("taskExecutor")
     @Scheduled(cron = "0 * * * * ?")
-    public void execute() {
+    public void liveStatus() {
 
         // 获取所有 房间id
         List<String> roomIds = liveInfoRepository.findAllRoomId();

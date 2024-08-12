@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-public interface GroupInfoRepository  extends JpaRepository<GroupInfo,Long>, JpaSpecificationExecutor<GroupInfo> {
+public interface GroupInfoRepository extends JpaRepository<GroupInfo,Long>, JpaSpecificationExecutor<GroupInfo> {
 
     GroupInfo findGroupInfoByGroupIdAndBotId(Long group_id, Long bot_id);
 

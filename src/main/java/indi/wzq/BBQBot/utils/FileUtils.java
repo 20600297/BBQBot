@@ -1,9 +1,12 @@
 package indi.wzq.BBQBot.utils;
 
+import com.alibaba.fastjson2.JSON;
+
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 
 public class FileUtils {
 
@@ -113,4 +116,38 @@ public class FileUtils {
         }
     }
 
+    /**
+     * 将 cookies 写入json文件
+     * @param map cookie的map
+     * @param file_path 文件路径
+     */
+    public static void saveCookieMap(Map<String,String> map , String file_path){
+        try (FileWriter writer = new FileWriter(file_path)) {
+            String jsonString = JSON.toJSONString(map);
+            writer.write(jsonString);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 读取 cookies
+     * @param file_path 文件路径
+     * @return cookie的map
+     */
+    public static Map<String,String> readCookieMap(String file_path){
+        try (FileReader reader = new FileReader(file_path)) {
+            // 读取整个文件内容为一个字符串
+            StringBuilder sb = new StringBuilder();
+            int c;
+            while ((c = reader.read()) != -1) {
+                sb.append((char) c);
+            }
+            String jsonString = sb.toString();
+            return JSON.parseObject(jsonString, Map.class);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 }
