@@ -133,9 +133,9 @@ public class FileUtils {
     /**
      * 读取 cookies
      * @param file_path 文件路径
-     * @return cookie的map
+     * @return cookie
      */
-    public static Map<String,String> readCookieMap(String file_path){
+    public static String readCookie(String file_path){
         try (FileReader reader = new FileReader(file_path)) {
             // 读取整个文件内容为一个字符串
             StringBuilder sb = new StringBuilder();
@@ -144,7 +144,19 @@ public class FileUtils {
                 sb.append((char) c);
             }
             String jsonString = sb.toString();
-            return JSON.parseObject(jsonString, Map.class);
+
+            Map<String, String> map = JSON.parseObject(jsonString, Map.class);
+
+            StringBuilder cookieBuilder = new StringBuilder();
+            boolean isFirstEntry = true;
+            for (Map.Entry<String, String> entry : map.entrySet()) {
+                if (!isFirstEntry) {
+                    cookieBuilder.append(";");
+                }
+                cookieBuilder.append(entry.getKey()).append("=").append(entry.getValue());
+                isFirstEntry = false;
+            }
+            return cookieBuilder.toString();
         } catch (IOException e) {
             e.printStackTrace();
         }

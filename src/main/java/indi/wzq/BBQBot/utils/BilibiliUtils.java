@@ -6,14 +6,11 @@ import indi.wzq.BBQBot.entity.bilibili.Dynamic.Dynamic;
 import indi.wzq.BBQBot.entity.bilibili.LiveInfo;
 import indi.wzq.BBQBot.entity.bilibili.UpInfo;
 import indi.wzq.BBQBot.enums.API;
-import indi.wzq.BBQBot.repo.UpInfoRepository;
 import indi.wzq.BBQBot.repo.dynamic.AVDynamicRepository;
 import indi.wzq.BBQBot.repo.dynamic.DynamicRepository;
 import indi.wzq.BBQBot.utils.http.HttpUtils;
-import indi.wzq.BBQBot.utils.onebot.Msg;
 import okhttp3.Headers;
 
-import java.io.IOException;
 import java.util.Date;
 import java.util.Map;
 
@@ -55,14 +52,14 @@ public class BilibiliUtils {
      */
     public static UpInfo getUpInfoByUID(String mid){
         // 获取cookies
-        Map<String, String> cookiesMap = FileUtils.readCookieMap("./data/cookies.json");
-        if (cookiesMap == null) {
+        String cookie = FileUtils.readCookie("./data/cookies.json");
+        if (cookie == null) {
             return null;
         }
 
         HttpUtils.Body body = HttpUtils.sendGet(API.BILIBILI_GET_USER_CARD.getUrl(),
                 "mid="+mid,
-                Headers.of(cookiesMap).newBuilder());
+                Headers.of("Cookie",cookie).newBuilder());
 
         JSONObject card = JSONObject.parseObject(body.getBody()).getJSONObject("data").getJSONObject("card");
 
@@ -76,15 +73,15 @@ public class BilibiliUtils {
      */
     public static Dynamic getUpNewDynamic(String mid){
         // 获取cookies
-        Map<String, String> cookiesMap = FileUtils.readCookieMap("./data/cookies.json");
-        if (cookiesMap == null) {
+        String cookie = FileUtils.readCookie("./data/cookies.json");
+        if (cookie == null) {
             return null;
         }
 
         HttpUtils.Body body = HttpUtils.sendGet(
                 API.BILIBILI_GET_DYNAMIC_SPACE.getUrl(),
                 "host_mid=" + mid,
-                Headers.of(cookiesMap).newBuilder());
+                Headers.of("Cookie",cookie).newBuilder());
 
         return disposeSpaceDynamics(JSONObject.parseObject(body.getBody()));
     }

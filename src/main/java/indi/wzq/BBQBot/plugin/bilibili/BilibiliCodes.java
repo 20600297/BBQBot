@@ -98,7 +98,7 @@ public class BilibiliCodes {
         }
 
         // 获取目标up的uid
-        String mid = event.getRawMessage().replaceAll(Codes.LIVE_SUBSCRIBE.getStr(), "").trim();
+        String mid = event.getRawMessage().replaceAll(Codes.UP_SUBSCRIBE.getStr(), "").trim();
         // 判断是否为空
         if (mid.isEmpty()) {
             bot.sendMsg(event, "订阅UP指令后面加上要订阅的UID！", false);
@@ -126,9 +126,6 @@ public class BilibiliCodes {
             return;
         }
 
-        // 储存UP信息
-        SpringUtils.getBean(UpInfoRepository.class).save(upInfo);
-
         // 构建订阅信息并储存
         UpSubscribe upSubscribe = new UpSubscribe(
                 bot.getSelfId(),
@@ -142,6 +139,12 @@ public class BilibiliCodes {
                 .text("[" + upInfo.getUname() + "]")
                 .build();
         bot.sendMsg(event, msg, false);
+
+        Dynamic newDynamic = BilibiliUtils.getUpNewDynamic(mid);
+        upInfo.setDynamic(newDynamic);
+
+        // 储存UP信息
+        SpringUtils.getBean(UpInfoRepository.class).save(upInfo);
     }
 
     /**
