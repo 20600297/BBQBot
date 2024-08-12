@@ -66,7 +66,6 @@ public class BilibiliUtils {
 
         JSONObject card = JSONObject.parseObject(body.getBody()).getJSONObject("data").getJSONObject("card");
 
-
         return new UpInfo(mid, card.getString("name"), card.getString("face"), null);
     }
 
