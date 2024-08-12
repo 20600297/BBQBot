@@ -3,10 +3,8 @@ package indi.wzq.BBQBot.task;
 import indi.wzq.BBQBot.entity.bilibili.Dynamic.Dynamic;
 import indi.wzq.BBQBot.entity.bilibili.UpInfo;
 import indi.wzq.BBQBot.plugin.bilibili.BilibiliCodes;
-import indi.wzq.BBQBot.repo.LiveInfoRepository;
 import indi.wzq.BBQBot.repo.UpInfoRepository;
 import indi.wzq.BBQBot.utils.BilibiliUtils;
-import indi.wzq.BBQBot.utils.DateUtils;
 import indi.wzq.BBQBot.utils.SpringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
@@ -25,16 +23,18 @@ public class TaskBilibiliUpInfo {
     @Async("taskExecutor")
     @Scheduled(cron = "30 * * * * ?")
     public void newDynamic(){
-        List<UpInfo> all = upInfoRepository.findAll();
+        List<String> all = upInfoRepository.findAllMid();
 
-        for (UpInfo upInfo : all){
-            Dynamic newDynamic = BilibiliUtils.getUpNewDynamic(upInfo.getMId());
+        for (String mid : all){
+            Dynamic newDynamic = BilibiliUtils.getUpNewDynamic(mid);
             if (newDynamic == null) {
-                log.warn("["+ upInfo.getMId() +"] - 动态获取异常");
+                log.warn("["+ mid +"] - 动态获取异常");
                 break;
             }
 
+            UpInfo upInfo = upInfoRepository.findLiveByMid(mid);
             Dynamic oldDynamic = upInfo.getDynamic();
+
             if (oldDynamic == null) {
                 BilibiliCodes.newDynamic(upInfo , newDynamic);
                 return;

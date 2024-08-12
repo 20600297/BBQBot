@@ -16,7 +16,7 @@ public class UpInfo {
 
     // mid
     @Id
-    String mId;
+    String mid;
 
     // UP昵称
     String uname;
@@ -29,7 +29,7 @@ public class UpInfo {
     Dynamic dynamic;
 
     public UpInfo(String mid){
-        this.mId = mid;
+        this.mid = mid;
         this.uname = "";
         this.face = "";
         this.dynamic = null;

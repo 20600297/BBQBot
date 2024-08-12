@@ -1,11 +1,9 @@
 package indi.wzq.BBQBot.plugin.bilibili;
 
-import com.alibaba.fastjson2.JSONObject;
 import com.mikuac.shiro.constant.ActionParams;
 import com.mikuac.shiro.core.Bot;
 import com.mikuac.shiro.core.BotContainer;
 import com.mikuac.shiro.dto.event.message.AnyMessageEvent;
-import indi.wzq.BBQBot.entity.bilibili.Dynamic.AVDynamic;
 import indi.wzq.BBQBot.entity.bilibili.Dynamic.Dynamic;
 import indi.wzq.BBQBot.entity.bilibili.LiveInfo;
 import indi.wzq.BBQBot.entity.bilibili.UpInfo;
@@ -16,8 +14,6 @@ import indi.wzq.BBQBot.repo.LiveInfoRepository;
 import indi.wzq.BBQBot.repo.LiveSubscribeRepository;
 import indi.wzq.BBQBot.repo.UpInfoRepository;
 import indi.wzq.BBQBot.repo.UpSubscribeRepository;
-import indi.wzq.BBQBot.repo.dynamic.AVDynamicRepository;
-import indi.wzq.BBQBot.repo.dynamic.DynamicRepository;
 import indi.wzq.BBQBot.utils.BilibiliUtils;
 import indi.wzq.BBQBot.utils.SpringUtils;
 import indi.wzq.BBQBot.utils.onebot.Msg;
@@ -110,7 +106,7 @@ public class BilibiliCodes {
         }
 
         // 判断是否已经订阅
-        if (upSubscribeRepository.existsByGroupIdAndMId(event.getGroupId(), mid)) {
+        if (upSubscribeRepository.existsByGroupIdAndMid(event.getGroupId(), mid)) {
             String msg = Msg.builder()
                     .text("订阅失败！\r\n")
                     .text("[" + mid + "]" + "已经订阅了呢\r\n")
@@ -223,7 +219,7 @@ public class BilibiliCodes {
         UpSubscribeRepository upSubscribeRepository = SpringUtils.getBean(UpSubscribeRepository.class);
         BotContainer botContainer = SpringUtils.getBean(BotContainer.class);
 
-        List<UpSubscribe> allSubscribe = upSubscribeRepository.findAllByMId(upInfo.getMId());
+        List<UpSubscribe> allSubscribe = upSubscribeRepository.findAllByMid(upInfo.getMid());
 
         String msg;
         switch (newDynamic.getType()){

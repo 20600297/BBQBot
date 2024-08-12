@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface UpSubscribeRepository extends JpaRepository<UpSubscribe,String>, JpaSpecificationExecutor<UpSubscribe> {
 
-    List<UpSubscribe> findAllByMId(String mid);
+    List<UpSubscribe> findAllByMid(String mid);
 
-    boolean existsByGroupIdAndMId(Long groupId, String MId);
+    boolean existsByGroupIdAndMid(Long groupId, String MId);
 }

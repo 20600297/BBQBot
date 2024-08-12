@@ -26,11 +26,11 @@ public class UpSubscribe {
     Long groupId;
 
     // up的mid
-    String mId;
+    String mid;
 
     public UpSubscribe(long botId, long groupId, String mId){
         this.botId = botId;
         this.groupId =  groupId;
-        this.mId = mId;
+        this.mid = mId;
     }
 }
