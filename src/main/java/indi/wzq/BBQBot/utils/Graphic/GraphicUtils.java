@@ -20,7 +20,7 @@ import java.util.Random;
 
 public class GraphicUtils {
 
-    private static final String VERSION = "v1.0.5";
+    private static final String VERSION = "v1.0.6";
 
     /**
      * 绘制签到返回图像
