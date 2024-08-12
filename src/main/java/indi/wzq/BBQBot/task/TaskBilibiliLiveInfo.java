@@ -16,7 +16,7 @@ import java.util.Map;
 
 @Component
 @Slf4j
-public class TaskBilibiliLiveStatus {
+public class TaskBilibiliLiveInfo {
     private static final LiveInfoRepository liveInfoRepository = SpringUtils.getBean(LiveInfoRepository.class);
 
     /**
@@ -67,15 +67,6 @@ public class TaskBilibiliLiveStatus {
                 }
             }
         }
-    }
-
-    /**
-     * 存活日志
-     */
-    @Async("taskExecutor")
-    @Scheduled(cron = "0 0 * * * ?")
-    public void life(){
-        log.info("-----当前程序正常存活！-----");
     }
 
     /**
