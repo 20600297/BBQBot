@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 public class LiveInfo {
 
 
-    // 房间id
+    // mid
     @Id
     String roomId;
 

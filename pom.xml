@@ -113,6 +113,20 @@
             <version>6.8.0.202311291450-r</version>
         </dependency>
 
+        <!-- 二维码依赖 开始-->
+        <dependency>
+            <groupId>com.google.zxing</groupId>
+            <artifactId>core</artifactId>
+            <version>3.4.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.zxing</groupId>
+            <artifactId>javase</artifactId>
+            <version>3.4.0</version>
+        </dependency>
+        <!-- 二维码依赖 结束-->
+
     </dependencies>
 
     <build>
