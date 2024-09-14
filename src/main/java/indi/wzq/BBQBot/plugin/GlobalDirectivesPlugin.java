@@ -10,7 +10,6 @@ import com.mikuac.shiro.dto.event.notice.GroupDecreaseNoticeEvent;
 import com.mikuac.shiro.dto.event.request.GroupAddRequestEvent;
 import indi.wzq.BBQBot.enums.Codes;
 import indi.wzq.BBQBot.plugin.bilibili.BilibiliCodes;
-import indi.wzq.BBQBot.plugin.group.GroupChat;
 import indi.wzq.BBQBot.plugin.group.GroupEvent;
 import indi.wzq.BBQBot.plugin.group.GroupCodes;
 import indi.wzq.BBQBot.utils.CodeUtils;
@@ -61,9 +60,6 @@ public class GlobalDirectivesPlugin {
                 case TAROT_GET_TAROT -> GroupCodes.getTarot(bot,event);
                 case TAROT_GET_TAROTS -> GroupCodes.getTarots(bot,event);
                 case TAROT_GET_FORMATIONS -> GroupCodes.getFormations(bot,event);
-
-                case CHAT_AIR_CONDITIONER_OPEN -> GroupChat.AirConditionerOpen(bot,event);
-                case CHAT_AIR_CONDITIONER_CLOSE -> GroupChat.AirConditionerClose(bot,event);
 
                 case BILIBILI_ACCOUNT_LOGIN -> AccountCodes.BilibiliLogin(bot,event);
             }

@@ -1,5 +1,6 @@
 package indi.wzq.BBQBot.utils;
 
+import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import indi.wzq.BBQBot.entity.bilibili.Dynamic.AVDynamic;
 import indi.wzq.BBQBot.entity.bilibili.Dynamic.Dynamic;
@@ -9,11 +10,13 @@ import indi.wzq.BBQBot.enums.API;
 import indi.wzq.BBQBot.repo.dynamic.AVDynamicRepository;
 import indi.wzq.BBQBot.repo.dynamic.DynamicRepository;
 import indi.wzq.BBQBot.utils.http.HttpUtils;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.Headers;
 
 import java.util.Date;
 import java.util.Map;
 
+@Slf4j
 public class BilibiliUtils {
 
     /**
@@ -40,7 +43,7 @@ public class BilibiliUtils {
             Long live_start_time = room_info.getLong("live_start_time");
             return new LiveInfo(room_id,uname,face,title,cover,live_status,live_start_time);
         } else {
-            System.out.println(room_id + "：直播间状态异常");
+            log.error(room_id + "：直播间状态异常");
             return null;
         }
     }
@@ -54,6 +57,7 @@ public class BilibiliUtils {
         // 获取cookies
         String cookie = FileUtils.readCookie("./data/cookies.json");
         if (cookie == null) {
+            log.error("Bilibili的Cookies获取异常！");
             return null;
         }
 
@@ -75,6 +79,7 @@ public class BilibiliUtils {
         // 获取cookies
         String cookie = FileUtils.readCookie("./data/cookies.json");
         if (cookie == null) {
+            log.error("Bilibili的Cookies获取异常！");
             return null;
         }
 
@@ -93,16 +98,28 @@ public class BilibiliUtils {
      */
     private static Dynamic disposeSpaceDynamics(JSONObject space_json){
 
-        JSONObject firstDynamic = space_json.getJSONObject("data").getJSONArray("items").getJSONObject(0);
+        JSONArray items = space_json.getJSONObject("data").getJSONArray("items");
+        JSONObject firstDynamic = items.getJSONObject(0);
 
+        // 校验是否获取异常
         if (firstDynamic == null) {
+            log.error("动态解析异常！");
             return null;
+        }
+
+        JSONObject modules = firstDynamic.getJSONObject("modules");
+
+        // 校验是否为置顶动态
+        if ( modules.getJSONObject("module_tag") != null ){
+            if ( modules.getJSONObject("module_tag").getString("text").equals("置顶") ){
+                firstDynamic = items.getJSONObject(1);
+                modules = firstDynamic.getJSONObject("modules");
+            }
         }
 
         String id = firstDynamic.getString("id_str");
         String type = firstDynamic.getString("type");
 
-        JSONObject modules = firstDynamic.getJSONObject("modules");
 
         long time = modules.getJSONObject("module_author").getLong("pub_ts") * 1000;
         Date date = new Date(time);
@@ -132,7 +149,7 @@ public class BilibiliUtils {
                 return dynamic;
             }
             default -> {
-                Dynamic dynamic = new Dynamic(id, date, type, null);
+                Dynamic dynamic = new Dynamic(id, date, type, "");
 
                 SpringUtils.getBean(DynamicRepository.class).save(dynamic);
                 return dynamic;

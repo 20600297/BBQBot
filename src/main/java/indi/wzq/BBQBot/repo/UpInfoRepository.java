@@ -12,7 +12,7 @@ public interface UpInfoRepository extends JpaRepository<UpInfo,String>, JpaSpeci
     @Query("SELECT l.mid FROM UpInfo l")
     List<String> findAllMid();
 
-    UpInfo findLiveByMid(String mid);
+    UpInfo findInfoByMid(String mid);
 
 
 }

@@ -12,7 +12,7 @@ public class GroupEvent {
 
         String msg = Msg.builder()
                 .at(event.getUserId())
-                .text(" 这里是momo的粮仓！" + "\t\n")
+                .text("\t\n")
                 .text("欢迎您的加入！")
                 .build();
         bot.sendGroupMsg(event.getGroupId(), msg,false);

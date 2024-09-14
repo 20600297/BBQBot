@@ -32,7 +32,7 @@ public class TaskBilibiliUpInfo {
                 break;
             }
 
-            UpInfo upInfo = upInfoRepository.findLiveByMid(mid);
+            UpInfo upInfo = upInfoRepository.findInfoByMid(mid);
             Dynamic oldDynamic = upInfo.getDynamic();
 
             if (oldDynamic == null) {

@@ -4,6 +4,7 @@ import com.mikuac.shiro.constant.ActionParams;
 import com.mikuac.shiro.core.Bot;
 import com.mikuac.shiro.core.BotContainer;
 import com.mikuac.shiro.dto.event.message.AnyMessageEvent;
+import indi.wzq.BBQBot.entity.bilibili.Dynamic.AVDynamic;
 import indi.wzq.BBQBot.entity.bilibili.Dynamic.Dynamic;
 import indi.wzq.BBQBot.entity.bilibili.LiveInfo;
 import indi.wzq.BBQBot.entity.bilibili.UpInfo;
@@ -89,6 +90,7 @@ public class BilibiliCodes {
      * @param event Event
      */
     public static void UpSubscribe(Bot bot, AnyMessageEvent event){
+        //TODO:优化
         UpSubscribeRepository upSubscribeRepository = SpringUtils.getBean(UpSubscribeRepository.class);
 
         // 判断是否为群组触发
@@ -230,43 +232,52 @@ public class BilibiliCodes {
     public static void newDynamic(UpInfo upInfo ,Dynamic newDynamic){
         UpSubscribeRepository upSubscribeRepository = SpringUtils.getBean(UpSubscribeRepository.class);
         BotContainer botContainer = SpringUtils.getBean(BotContainer.class);
+        UpInfoRepository upInfoRepository = SpringUtils.getBean(UpInfoRepository.class);
+
+        // 更新最新动态信息
+        upInfo.setDynamic(newDynamic);
+        upInfoRepository.save(upInfo);
 
         List<UpSubscribe> allSubscribe = upSubscribeRepository.findAllByMid(upInfo.getMid());
 
-        String msg;
+        Msg msg = Msg.builder()
+                .atAll()
+                .text("\r\n订阅的UP [" + upInfo.getUname() + "]\r\n");
+
         switch (newDynamic.getType()){
             case "DYNAMIC_TYPE_AV" ->{
                 // 发布视频
-                msg = Msg.builder()
-                        .atAll()
-                        .text("\r\n订阅的UP [" + upInfo.getUname() + "]\r\n")
-                        .text("发布新视频啦！快去围观！\r\n")
-                        .text(newDynamic.getJumpUrl())
-                        .build();
+                AVDynamic dynamic = (AVDynamic) newDynamic;
+                msg.text(dynamic.newMsg());
             }
             case "DYNAMIC_TYPE_DRAW" -> {
                 // 图文动态
-                msg = Msg.builder()
-                        .atAll()
-                        .text("\r\n订阅的UP [" + upInfo.getUname() + "]\r\n")
-                        .text("发布新的图文动态啦！快去围观！\r\n")
-                        .text(newDynamic.getJumpUrl())
-                        .build();
+                msg.text("发布新的图文动态啦！快去围观！\r\n")
+                        .text(newDynamic.getJumpUrl());
+            }
+            case "DYNAMIC_TYPE_WORD" -> {
+                // 文字动态
+                msg.text("发布了新的文字动态啦！快去围观！\r\n")
+                        .text(newDynamic.getJumpUrl());
+            }
+            case "DYNAMIC_TYPE_FORWARD" -> {
+                // 动态转发
+                msg.text("转发了别人的动态啦！快去围观！\r\n")
+                        .text(newDynamic.getJumpUrl());
+            }
+            case "DYNAMIC_TYPE_LIVE_RCMD" -> {
+                return;
             }
             default -> {
-                msg = Msg.builder()
-                        .atAll()
-                        .text("\r\n订阅的UP [" + upInfo.getUname() + "]\r\n")
-                        .text("发布新的动态啦！快去围观！\r\n")
-                        .text(newDynamic.getJumpUrl())
-                        .build();
+                msg.text("发布新的动态啦！快去围观！\r\n")
+                        .text(newDynamic.getJumpUrl());
             }
         }
 
         for (UpSubscribe subscribe : allSubscribe){
             // 发送推送信息
             botContainer.robots.get(subscribe.getBotId())
-                    .sendGroupMsg(subscribe.getGroupId(), msg, false);
+                    .sendGroupMsg(subscribe.getGroupId(), msg.build(), false);
         }
 
     }
