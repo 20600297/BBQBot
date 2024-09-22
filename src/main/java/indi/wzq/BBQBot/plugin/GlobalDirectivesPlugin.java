@@ -9,9 +9,11 @@ import com.mikuac.shiro.dto.event.message.AnyMessageEvent;
 import com.mikuac.shiro.dto.event.notice.GroupDecreaseNoticeEvent;
 import com.mikuac.shiro.dto.event.request.GroupAddRequestEvent;
 import indi.wzq.BBQBot.enums.Codes;
-import indi.wzq.BBQBot.plugin.bilibili.BilibiliCodes;
-import indi.wzq.BBQBot.plugin.group.GroupEvent;
-import indi.wzq.BBQBot.plugin.group.GroupCodes;
+import indi.wzq.BBQBot.permissions.Permissions;
+import indi.wzq.BBQBot.plugin.code.AccountCodes;
+import indi.wzq.BBQBot.plugin.code.BilibiliCodes;
+import indi.wzq.BBQBot.plugin.code.GroupEvent;
+import indi.wzq.BBQBot.plugin.code.GroupCodes;
 import indi.wzq.BBQBot.utils.CodeUtils;
 import indi.wzq.BBQBot.utils.onebot.CqMatcher;
 import indi.wzq.BBQBot.utils.onebot.CqParse;
@@ -48,19 +50,38 @@ public class GlobalDirectivesPlugin {
 
         // 判断触发指令
         Optional.ofNullable(code).ifPresent(codes -> {
+
+            // 权限校验
+            if (Permissions.checkAdmin(bot, event).getI() < code.getPermissions().getI()){
+                GroupEvent.unPermissions(bot,event);
+                return;
+            }
+
             switch (codes) {
-                case LIVE_SUBSCRIBE -> BilibiliCodes.LiveSubscribe(bot,event);
-                case UP_SUBSCRIBE -> BilibiliCodes.UpSubscribe(bot,event);
+                // 帮助
+                case HELP -> GroupEvent.Help(bot,event);
+                // 订阅直播间
+                case SUBSCRIBE_LIVE -> BilibiliCodes.subscribeLive(bot,event);
+                // 订阅UP主
+                case SUBSCRIBE_UP -> BilibiliCodes.subscribeUp(bot,event);
+                // 订阅每日早报
+                case SUBSCRIBE_DAILYNEWS -> GroupCodes.subscribeDailyNews(bot,event);
 
+                // 签到
                 case GROUP_SIGNIN -> GroupCodes.signIn(bot,event);
-                case GROUP_DAILYNEWS -> GroupCodes.DailyNews(bot,event);
-                case GROUP_FORTUNE -> GroupCodes.Fortune(bot,event);
-                case GROUP_SUBSCRIBE_DAILYNEWS -> GroupCodes.subscribeDailyNews(bot,event);
+                // 今日早报
+                case GROUP_DAILYNEWS -> GroupCodes.todayNews(bot,event);
+                // 今日运势
+                case GROUP_FORTUNE -> GroupCodes.fortune(bot,event);
 
+                // 抽塔罗牌
                 case TAROT_GET_TAROT -> GroupCodes.getTarot(bot,event);
+                // 抽N张塔罗牌
                 case TAROT_GET_TAROTS -> GroupCodes.getTarots(bot,event);
+                // 塔罗牌阵
                 case TAROT_GET_FORMATIONS -> GroupCodes.getFormations(bot,event);
 
+                // 登陆BiliBili
                 case BILIBILI_ACCOUNT_LOGIN -> AccountCodes.BilibiliLogin(bot,event);
             }
         });

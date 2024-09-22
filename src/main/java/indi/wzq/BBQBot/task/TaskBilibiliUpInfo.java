@@ -2,7 +2,7 @@ package indi.wzq.BBQBot.task;
 
 import indi.wzq.BBQBot.entity.bilibili.Dynamic.Dynamic;
 import indi.wzq.BBQBot.entity.bilibili.UpInfo;
-import indi.wzq.BBQBot.plugin.bilibili.BilibiliCodes;
+import indi.wzq.BBQBot.plugin.code.BilibiliCodes;
 import indi.wzq.BBQBot.repo.UpInfoRepository;
 import indi.wzq.BBQBot.utils.BilibiliUtils;
 import indi.wzq.BBQBot.utils.SpringUtils;

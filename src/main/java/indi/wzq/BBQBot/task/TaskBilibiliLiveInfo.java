@@ -1,7 +1,7 @@
 package indi.wzq.BBQBot.task;
 
 import indi.wzq.BBQBot.entity.bilibili.LiveInfo;
-import indi.wzq.BBQBot.plugin.bilibili.BilibiliCodes;
+import indi.wzq.BBQBot.plugin.code.BilibiliCodes;
 import indi.wzq.BBQBot.repo.LiveInfoRepository;
 import indi.wzq.BBQBot.utils.BilibiliUtils;
 import indi.wzq.BBQBot.utils.SpringUtils;

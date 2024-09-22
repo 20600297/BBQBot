@@ -1,4 +1,4 @@
-package indi.wzq.BBQBot.plugin;
+package indi.wzq.BBQBot.plugin.code;
 
 import com.alibaba.fastjson2.JSONObject;
 import com.google.zxing.WriterException;

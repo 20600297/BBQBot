@@ -1,4 +1,4 @@
-package indi.wzq.BBQBot.plugin.group;
+package indi.wzq.BBQBot.plugin.code;
 
 import com.alibaba.fastjson2.JSONObject;
 import com.mikuac.shiro.common.utils.ShiroUtils;
@@ -9,6 +9,10 @@ import indi.wzq.BBQBot.entity.group.GroupInfo;
 import indi.wzq.BBQBot.entity.group.GroupTask;
 import indi.wzq.BBQBot.entity.group.UserInfo;
 import indi.wzq.BBQBot.enums.Codes;
+import indi.wzq.BBQBot.plugin.core.FortuneCore;
+import indi.wzq.BBQBot.plugin.core.NewsCore;
+import indi.wzq.BBQBot.plugin.core.SignCore;
+import indi.wzq.BBQBot.plugin.core.TarotCore;
 import indi.wzq.BBQBot.repo.GroupInfoRepository;
 import indi.wzq.BBQBot.repo.GroupTaskRepository;
 import indi.wzq.BBQBot.repo.UserInfoRepository;
@@ -27,12 +31,6 @@ import java.util.regex.Pattern;
 @Slf4j
 public class GroupCodes {
 
-    private static final UserInfoRepository userInfoRepository = SpringUtils.getBean(UserInfoRepository.class);
-
-    private static final GroupInfoRepository groupInfoRepository = SpringUtils.getBean(GroupInfoRepository.class);
-
-    private static final GroupTaskRepository groupTaskRepository = SpringUtils.getBean(GroupTaskRepository.class);
-
     /**
      * 用户签到事件
      * @param bot Bot
@@ -40,29 +38,12 @@ public class GroupCodes {
      */
     public static void signIn(Bot bot, AnyMessageEvent event) {
 
-        // 判断是否为群组触发
-        if (!ActionParams.GROUP.equals(event.getMessageType())) {
-            bot.sendMsg(event, "此指令只能在群组中使用！", false);
-            return;
-        }
-
-        // 获取签到用户id
-        Long signUserId = event.getUserId();
-
-        // 通过签到用户id获取用户信息
-        UserInfo userInfo = userInfoRepository.findByUserId(signUserId);
-
-        // 如果未获得到用户信息则初始化用户信息
-        if (userInfo == null)
-            userInfo = new UserInfo(event.getUserId());
-
-        // 获取当前时间
-        Date signInTime = new Date();
-        String[] msgs = DailyMaster.getSignInMsg(userInfo, event.getSender().getNickname(), signInTime, event.getMessageId());
+        String[] msgs = SignCore.getSignInMsg(event.getUserId(), event.getSender().getNickname(), event.getMessageId());
 
         // 返回信息
         for (String msg : msgs)
             bot.sendMsg( event,msg,false );
+
     }
 
     /**
@@ -70,41 +51,16 @@ public class GroupCodes {
      * @param bot Bot
      * @param event Event
      */
-    public static void Fortune(Bot bot, AnyMessageEvent event){
-        Random random = new Random();
-        String path = "/static/img/jrys/"+(random.nextInt(33)+1)+".jpg";
-        // 绘制签到图像
-        BufferedImage bufferedImage = GraphicUtils
-                .graphicFortune(path);
+    public static void fortune(Bot bot, AnyMessageEvent event){
 
-        Date date = new Date();
-
-        UserInfo userInfo = userInfoRepository.findByUserId(event.getUserId());
-
-        // 如果未获得到用户信息则初始化用户信息
-        if (userInfo == null)
-            userInfo = new UserInfo(event.getUserId());
-
-        if (DateUtils.isYesterdayOrEarlier(userInfo.getFortuneTime(),date)) {
-            String msg = Msg.builder()
-                    .at(event.getUserId())
-                    .text(" 今日运势")
-                    .imgBase64(FileUtils.bufferedImage2Bytes(bufferedImage))
-                    .build();
-
-            bot.sendMsg(event, msg, false);
-        } else {
-            String msg = Msg.builder()
-                    .at(event.getUserId())
-                    .text(" 每人一天限抽签1次呢！\r\n")
-                    .text("贪心的人是不会有好运的。")
-                    .build();
-
-            bot.sendMsg(event, msg, false);
+        // 判断是否为群组触发
+        if (!ActionParams.GROUP.equals(event.getMessageType())) {
+            bot.sendMsg(event, "此指令只能在群组中使用！", false);
+            return;
         }
 
-        userInfo.setFortuneTime(date);
-        userInfoRepository.save(userInfo);
+        bot.sendMsg(event , FortuneCore.getFortune(event.getUserId()),false);
+
     }
 
     /**
@@ -113,30 +69,17 @@ public class GroupCodes {
      * @param event Event
      */
     public static void subscribeDailyNews(Bot bot, AnyMessageEvent event) {
-        long group_id = event.getGroupId();
-        long bot_id = bot.getLoginInfo().getData().getUserId();
 
-        GroupTask groupTask = groupTaskRepository.findByGroupId(group_id);
-
-        if (groupTask == null)
-            groupTask = new GroupTask(group_id);
-
-        groupTask.setDailyNews(true);
-
-        groupTaskRepository.save(groupTask);
-
-        GroupInfo groupInfo = groupInfoRepository.findGroupInfoByGroupIdAndBotId(group_id, bot_id);
-
-        if (groupInfo == null) {
-            groupInfo =new GroupInfo(group_id,bot_id);
+        // 判断是否为群组触发
+        if (!ActionParams.GROUP.equals(event.getMessageType())) {
+            bot.sendMsg(event, "此指令只能在群组中使用！", false);
+            return;
         }
-        groupInfoRepository.save(groupInfo);
 
-        String msg = Msg.builder()
-                .text("每日早报-订阅成功")
-                .build();
+        bot.sendMsg(event,
+                NewsCore.subscribe(event.getGroupId(),bot.getSelfId()),
+                false);
 
-        bot.sendMsg(event, msg, false);
     }
 
     /**
@@ -144,16 +87,15 @@ public class GroupCodes {
      * @param bot Bot
      * @param event Event
      */
-    public static void DailyNews(Bot bot, AnyMessageEvent event) {
-        HttpUtils.Body body = HttpUtils.sendGet("http://dwz.2xb.cn/zaob");
+    public static void todayNews(Bot bot, AnyMessageEvent event) {
 
-        String url = JSONObject.parseObject(body.getBody()).getString("imageUrl");
+        // 判断是否为群组触发
+        if (!ActionParams.GROUP.equals(event.getMessageType())) {
+            bot.sendMsg(event, "此指令只能在群组中使用！", false);
+            return;
+        }
 
-        String msg = Msg.builder()
-                .img(url)
-                .build();
-
-        bot.sendMsg(event, msg, false);
+        bot.sendMsg(event, NewsCore.todayNews() , false);
     }
 
     /**
@@ -166,10 +108,10 @@ public class GroupCodes {
         bot.sendMsg(event,"少女祷告中...",false);
 
         // 获取牌数据
-        String[] tarot = TarotMaster.getTarots(1)[0];
+        String[] tarot = TarotCore.getTarots(1)[0];
 
         // 构建返回信息
-        List<String> msgList = TarotMaster.creatMsg(tarot);
+        List<String> msgList = TarotCore.creatMsg(tarot);
 
         // 构建合并转发消息（selfId为合并转发消息显示的账号，nickname为显示的发送者昵称，msgList为消息列表）
         List<Map<String, Object>> forwardMsg = ShiroUtils
@@ -210,10 +152,10 @@ public class GroupCodes {
         }
 
         // 获取牌数据
-        String[][] tarots = TarotMaster.getTarots(num);
+        String[][] tarots = TarotCore.getTarots(num);
 
         // 构建返回信息
-        List<String> msgList = TarotMaster.creatMsg(tarots, num);
+        List<String> msgList = TarotCore.creatMsg(tarots, num);
 
         // 构建合并转发消息（selfId为合并转发消息显示的账号，nickname为显示的发送者昵称，msgList为消息列表）
         List<Map<String, Object>> forwardMsg = ShiroUtils
@@ -235,7 +177,7 @@ public class GroupCodes {
         bot.sendMsg(event,"少女祷告中...",false);
         String name = event.getMessage().replaceAll("^塔罗牌阵", "").trim() + "牌阵";
 
-        List<String> msgList = TarotMaster.getFormations(event.getSender().getNickname(), name);
+        List<String> msgList = TarotCore.getFormations(event.getSender().getNickname(), name);
 
         List<Map<String, Object>> forwardMsg = ShiroUtils
                 .generateForwardMsg(
@@ -247,5 +189,4 @@ public class GroupCodes {
         bot.sendGroupForwardMsg(event.getGroupId(), forwardMsg);
     }
 
-    //TODO :错误情况返回信息
 }

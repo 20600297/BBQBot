@@ -1,4 +1,4 @@
-package indi.wzq.BBQBot.plugin.group;
+package indi.wzq.BBQBot.plugin.core;
 
 import indi.wzq.BBQBot.entity.group.UserInfo;
 import indi.wzq.BBQBot.repo.UserInfoRepository;
@@ -16,16 +16,26 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Date;
 
-public class DailyMaster {
+public class SignCore {
 
     /**
      * 签到信息返回
-     * @param user_info 用户信息
-     * @param sign_time 签到时间
+     * @param user_id QQ号
+     * @param user_name QQ昵称
      * @param message_id 消息id
      * @return 签到返回信息
      */
-    public static String[] getSignInMsg(UserInfo user_info , String user_name , Date sign_time , Integer message_id){
+    public static String[] getSignInMsg( long user_id , String user_name , Integer message_id){
+
+        // 通过签到用户id获取用户信息
+        UserInfo user_info = SpringUtils.getBean(UserInfoRepository.class).findByUserId(user_id);
+
+        // 如果未获得到用户信息则初始化用户信息
+        if (user_info == null)
+            user_info = new UserInfo(user_id);
+
+        // 获取当前时间
+        Date sign_time = new Date();
 
         // 判断今日是否签到
         if ( DateUtils.isSameDay(sign_time,user_info.getSignInTime()) ){
@@ -129,6 +139,20 @@ public class DailyMaster {
         }
 
         return bytes;
+    }
+
+    /**
+     * @return  帮助文本
+     */
+    public static String getHelp(){
+
+        return Msg.builder()
+                .text("--- 签到 ---\r\n")
+                .text("指令：“签到”\r\n")
+                .text("功能：签到\r\n")
+                .text("-----------")
+                .build();
+
     }
 
 }

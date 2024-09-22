@@ -1,4 +1,4 @@
-package indi.wzq.BBQBot.plugin.bilibili;
+package indi.wzq.BBQBot.plugin.code;
 
 import com.mikuac.shiro.constant.ActionParams;
 import com.mikuac.shiro.core.Bot;
@@ -11,6 +11,8 @@ import indi.wzq.BBQBot.entity.bilibili.UpInfo;
 import indi.wzq.BBQBot.entity.group.LiveSubscribe;
 import indi.wzq.BBQBot.entity.group.UpSubscribe;
 import indi.wzq.BBQBot.enums.Codes;
+import indi.wzq.BBQBot.plugin.core.LiveCore;
+import indi.wzq.BBQBot.plugin.core.UpCore;
 import indi.wzq.BBQBot.repo.LiveInfoRepository;
 import indi.wzq.BBQBot.repo.LiveSubscribeRepository;
 import indi.wzq.BBQBot.repo.UpInfoRepository;
@@ -28,8 +30,7 @@ public class BilibiliCodes {
      * @param bot Bot
      * @param event Event
      */
-    public static void LiveSubscribe(Bot bot, AnyMessageEvent event) {
-        LiveInfoRepository liveInfoRepository = SpringUtils.getBean(LiveInfoRepository.class);
+    public static void subscribeLive(Bot bot, AnyMessageEvent event) {
         LiveSubscribeRepository liveSubscribeRepository = SpringUtils.getBean(LiveSubscribeRepository.class);
 
         // 判断是否为群组触发
@@ -39,7 +40,7 @@ public class BilibiliCodes {
         }
 
         // 获取目标房间id
-        String room_id = event.getRawMessage().replaceAll(Codes.LIVE_SUBSCRIBE.getStr(), "").trim();
+        String room_id = event.getRawMessage().replaceAll(Codes.SUBSCRIBE_LIVE.getStr(), "").trim();
         if (room_id.isEmpty()) {
             bot.sendMsg(event, "订阅直播间指令后面加上要订阅的房间号！", false);
             return;
@@ -51,37 +52,12 @@ public class BilibiliCodes {
             return;
         }
 
-        // 通过房间id获取直播间信息
-        LiveInfo liveInfo = BilibiliUtils.getLiveInfoByRoomId(room_id);
-        if (liveInfo == null) {
-            String msg = Msg.builder()
-                    .text("订阅失败！\r\n")
-                    .text("[" + room_id + "]" + "信息获取失败\r\n")
-                    .build();
-            bot.sendMsg(event, msg, false);
-            return;
-        }
+        // 尝试订阅直播间
+        String msg = LiveCore.subscribe(room_id, bot.getSelfId(), event.getGroupId());
 
-        // 保存直播间信息
-        liveInfoRepository.save(liveInfo);
-
-
-        // 构建订阅信息并储存
-        LiveSubscribe liveSubscribe = new LiveSubscribe(
-                bot.getSelfId(),
-                event.getGroupId(),
-                room_id
-        );
-        liveSubscribeRepository.save(liveSubscribe);
-
-        // 构建订阅成功返回消息
-        String msg = Msg.builder().text("成功订阅-\r\n")
-                .img(liveInfo.getFace())
-                .text(liveInfo.getUname() + "\r\n的直播间！")
-                .build();
-
-        // 发送订阅成功信息
+        // 发送返回信息
         bot.sendMsg(event, msg, false);
+
     }
 
     /**
@@ -89,8 +65,7 @@ public class BilibiliCodes {
      * @param bot Bot
      * @param event Event
      */
-    public static void UpSubscribe(Bot bot, AnyMessageEvent event){
-        //TODO:优化
+    public static void subscribeUp(Bot bot, AnyMessageEvent event){
         UpSubscribeRepository upSubscribeRepository = SpringUtils.getBean(UpSubscribeRepository.class);
 
         // 判断是否为群组触发
@@ -100,62 +75,29 @@ public class BilibiliCodes {
         }
 
         // 获取目标up的uid
-        String mid = event.getRawMessage().replaceAll(Codes.UP_SUBSCRIBE.getStr(), "").trim();
+        String uid = event.getRawMessage().replaceAll(Codes.SUBSCRIBE_UP.getStr(), "").trim();
         // 判断是否为空
-        if (mid.isEmpty()) {
+        if (uid.isEmpty()) {
             bot.sendMsg(event, "订阅UP指令后面加上要订阅的UID！", false);
             return;
         }
 
         // 判断是否已经订阅
-        if (upSubscribeRepository.existsByGroupIdAndMid(event.getGroupId(), mid)) {
+        if (upSubscribeRepository.existsByGroupIdAndMid(event.getGroupId(), uid)) {
             String msg = Msg.builder()
                     .text("订阅失败！\r\n")
-                    .text("[" + mid + "]\r\n")
+                    .text("[" + uid + "]\r\n")
                     .text("已经订阅了呢")
                     .build();
             bot.sendMsg(event, msg, false);
             return;
         }
 
-        // 获取 Up信息
-        UpInfo upInfo = BilibiliUtils.getUpInfoByUID(mid);
-        if (upInfo == null) {
-            String msg = Msg.builder()
-                    .text("订阅失败！\r\n")
-                    .text("[" + mid + "]\r\n")
-                    .text("信息获取失败")
-                    .build();
-            bot.sendMsg(event, msg, false);
-            return;
-        }
+        // 尝试订阅Up主
+        String msg = UpCore.subscribe(uid, bot.getSelfId(), event.getGroupId());
 
-        // 构建订阅信息并储存
-        UpSubscribe upSubscribe = new UpSubscribe(
-                bot.getSelfId(),
-                event.getGroupId(),
-                mid);
-        upSubscribeRepository.save(upSubscribe);
-
-        String msg = Msg.builder()
-                .text("成功订阅-\r\n")
-                .img(upInfo.getFace())
-                .text("[" + upInfo.getUname() + "]")
-                .build();
         bot.sendMsg(event, msg, false);
 
-        Dynamic newDynamic = BilibiliUtils.getUpNewDynamic(mid);
-        upInfo.setDynamic(newDynamic);
-
-        msg = Msg.builder()
-                .text("当前最新动态-\r\n")
-                .text("类型："+newDynamic.getType()+"\r\n")
-                .text(newDynamic.getJumpUrl())
-                .build();
-        bot.sendMsg(event, msg, false);
-
-        // 储存UP信息
-        SpringUtils.getBean(UpInfoRepository.class).save(upInfo);
     }
 
     /**

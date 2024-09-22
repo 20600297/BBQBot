@@ -1,4 +1,4 @@
-package indi.wzq.BBQBot.plugin.group;
+package indi.wzq.BBQBot.plugin.core;
 
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class TarotMaster {
+public class TarotCore {
 
     private static final String TAROT_JSON_PATH = "static/json/tarot/tarot.json";
     private static final String TAROT_IMG_PATH = "static/img/tarot/";
@@ -81,7 +81,7 @@ public class TarotMaster {
     }
 
     /**
-     * 生成塔罗牌阵回复
+     * 构建塔罗牌阵回复
      * @param user_name 用户名
      * @param formation_name 牌阵名
      * @return 返回消息列表
@@ -155,4 +155,27 @@ public class TarotMaster {
 
         return msgList;
     }
+
+    /**
+     * @return 帮助文本
+     */
+    public static String getHelp(){
+        return Msg.builder()
+                .text("--- 塔罗牌相关 ---\r\n")
+                .text("指令一：”抽塔罗牌“\r\n")
+                .text("功能：抽取一张塔罗牌并解牌\r\n")
+                .text("\r\n")
+                .text("指令二：”抽{1}张塔罗牌“\r\n")
+                .text("参数：1——抽取数量\r\n")
+                .text("  抽取数量：1至9的数字\r\n")
+                .text("功能：抽取N张塔罗牌并解牌\r\n")
+                .text("\r\n")
+                .text("指令三：”塔罗牌阵{1}“\r\n")
+                .text("参数：1——牌阵名\r\n")
+                .text("  牌阵名：圣三角|时间之流|四要素|五牌阵|吉普赛十字|马蹄|六芒星\r\n")
+                .text("功能：依照牌阵抽取塔罗牌并解牌\r\n")
+                .text("--------------")
+                .build();
+    }
+
 }
